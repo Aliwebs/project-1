@@ -17,28 +17,39 @@ body {
   border: 2px solid yellow;
   height: 100%;
   width: 1000px;
+  background-color: black;
 }
 
-#game-window div {}
+#game-window div {
+  display: flex;
+  align-items: center;
+}
 
 .wall {
-  background-color: black;
-  border-left: 1px solid blue;
-  border-right: 1px solid blue;
+  border: 1px solid blue;
 }
 
-.food {
+.empty {
+  background-color: black;
+}
+
+.path .food {
+  height: 5px;
+  width: 5px;
+  margin: 0 auto;
   background-color: yellow;
   border-radius: 50%;
+  display: inline-block;
 }
 
 .pacman {
-  background-color: red;
-  border-radius: 0;
+  background-color: yellow;
+  border-radius: 100%;
 }
 
-.ghosts {
+.ghost {
   border-top: 0.3px solid black;
   background-color: teal;
   border-radius: 20%;
+  z-index: 10;
 }
