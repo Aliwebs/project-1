@@ -7,25 +7,34 @@ let score = 0
 // grey comments are guesses on how I could go about it
 
 
-
-
-
 //? create a grid 
 // create a grid how Nick did in lesson needs to be a lot more bigger and 
 // the grid itself will be hidden*
-for (let i = 1; i <= width ** 2 + (width * 3); i++) {
-  const div = document.createElement('div')
-  div.style.width = `${100 / width}%`
-  div.id = i
-  div.style.height = `${100 / height}%`
-  grid.appendChild(div)
-  gridArray.push(div)
-}
+
+// for (let i = 1; i <= width ** 2 + (width * 3); i++) {
+//   const div = document.createElement('div')
+//   div.style.width = `${100 / width}%`
+//   div.innerHTML = i
+//   div.style.height = `${100 / height}%`
+//   grid.appendChild(div)
+//   gridArray.push(div)
+// }
+
+// refer to ./functions.js file
+const mappedGridArray = createMap(height, width)
+
 
 //? add blueprint onto grid, for MVP it will be a static board
 // Add the board on top of the grid, this could be coordinates of where 
 // all the walls will go or viceversa
-
+// from the walls array gives the class wall to all walls
+map1.forEach(number => {
+  gridArray[number - 1].classList.add('wall')
+})
+// gives the class empty to all other boxes outside player path 
+map1Exclude.forEach(number => {
+  gridArray[number - 1].classList.add('empty')
+})
 
 // ? Code to create a static board
 // let staticGrid = []
@@ -45,69 +54,109 @@ for (let i = 1; i <= width ** 2 + (width * 3); i++) {
 // document.querySelector('#logmap').addEventListener('click', () => {
 //   staticGrid.forEach(cell => console.log(cell))
 // })
-// from the walls array gives the class wall to all walls
-map1.forEach(number => {
-  gridArray[number - 1].classList.add('wall')
-})
-// gives the class empty to all other boxes outside player path 
-map1Exclude.forEach(number => {
-  gridArray[number - 1].classList.add('empty')
-})
-
 
 
 
 //? place the food that pacman needs to collect
 //place food on all free path cells
-gridArray.forEach(cell => {
-  if (cell.classList[0] !== 'wall' && cell.classList[0] !== 'empty') {
-    const span = document.createElement('span')
-    span.classList.add('food')
-    cell.appendChild(span)
-    cell.classList.add('path')
-  }
+mappedGridArray.forEach(row => {
+  row.forEach(cell => {
+    if (!cell.classList.contains('wall') && cell.classList[0] !== 'empty') {
+      const span = document.createElement('span')
+      span.classList.add('food')
+      cell.appendChild(span)
+      cell.classList.add('path')
+    }
+  })
 })
 
 // ? start the game - loop 
-let speed = 0
-// let x = 0
-// let y = 0
+let playerSpeed = 0
 setInterval(() => {
   //! pacman stops moving if it hits a wall while moving in a 
   //! given direction until player turns pacman
-  if (gridArray[pacman + speed].classList[0] === 'path') {
-    gridArray[pacman].classList.remove('pacman')
-    pacman = pacman + speed
+  //check if the next cell is a path
+  playerSpeed = 0
+  if (mappedGridArray[pacman.y - 1][pacman.x - 1].classList.contains('path')) {
+    mappedGridArray[pacman.y - 1][pacman.x - 1].classList.remove('pacman')
+    playerSpeed++
     //! pacman eats the food as it moves trough the maze
-    gridArray[pacman].classList.add('pacman')
-    if (gridArray[pacman].children[0].classList[0] === 'food') {
-      gridArray[pacman].children[0].classList.remove('food')
+    mappedGridArray[pacman.y - 1][pacman.x - 1].classList.add('pacman')
+    console.log(mappedGridArray[pacman.y - 1][pacman.x - 1].children[0].classList.contains('food'))
+    if (mappedGridArray[pacman.y - 1][pacman.x - 1].children[0].classList[0] === 'food') {
+      mappedGridArray[pacman.y - 1][pacman.x - 1].children[0].classList.remove('food')
       //keep tracked of food eaten
       score++
     }
 
   }
 
-}, 300)
+}, 500)
 //? spawn pacman in predifined location without any movement
 //span pacman under the ghost spawn box 
-let pacman = 562
-gridArray[pacman].classList.add('pacman')
+let pacman = { y: 23, x: 13 }
+mappedGridArray[pacman.y - 1][pacman.x - 1].classList.add('pacman')
+
 
 
 //? spawn 4 ghosts in spawn box
 //spawn 4 ghosts in the ghost box and make them exit with a delay of 2 seconds
 // each. i.e. second won't leave until first is gone for 2 seconds
-const ghosts = [287, 336, 337, 338]
-
+const ghosts = [{ y: 12, x: 13 }, { y: 14, x: 12 }, { y: 14, x: 13 }, { y: 14, x: 14 }]
+const ghostSpeed = [0, 0, 0, 0]
 ghosts.forEach(ghost => {
-  gridArray[ghost].classList.add('ghost')
-  gridArray[ghost].children[0].classList.remove('food')
+  mappedGridArray[ghost.y - 1][ghost.x - 1].classList.add('ghost')
+  mappedGridArray[ghost.y - 1][ghost.x - 1].children[0].classList.remove('food')
 })
 
 //? have ghosts move towards random directions in the grid
 // make ghosts move forward until they have to turn if there are 2 or more 
 // choices at an intersection choose randomly
+
+// setInterval(() => {
+
+//   ghostMove(ghosts[0], ghostSpeed[0])
+
+// }, 1000)
+
+
+// function ghostMove(ghost, speeed) {
+//   //check if there is a path on the right and then move to the rigt
+//   //if a wall is found then call this function again
+//   let foundPath = false
+//   if (gridArray[ghost + 1].classList[0] !== 'wall' && !foundPath) {
+//     foundPath = true
+//     gridArray[ghost].classList.remove('ghost')
+//     speeed += speeed + 1
+//     gridArray[ghost].classList.add('ghost')
+//     //check if there is a path on the left
+//   }
+//   if (gridArray[ghost - 1].classList[0] !== 'wall' && !foundPath) {
+//     foundPath = true
+//     gridArray[ghost].classList.remove('ghost')
+//     speeed += speeed - 1
+//     gridArray[ghost].classList.add('ghost')
+//     //check if there is a path up
+//   }
+//   if (gridArray[ghost - width].classList[0] !== 'wall' && !foundPath) {
+//     foundPath = true
+//     gridArray[ghost].classList.remove('ghost')
+//     speeed -= width
+//     gridArray[ghost].classList.add('ghost')
+//   }
+//   if (gridArray[ghost + width].classList[0] !== 'wall' && !foundPath) {
+//     foundPath = true
+//     gridArray[ghost].classList.remove('ghost')
+//     speeed += width
+//     gridArray[ghost].classList.add('ghost')
+//   }
+// }
+
+
+
+
+//check if there is a path on the bottom
+
 
 
 //? listen to player input and turn packman accoridngly
@@ -116,32 +165,29 @@ ghosts.forEach(ghost => {
 document.addEventListener('keydown', (e) => {
   const key = e.key
   if (key === 'w' || key === 'ArrowUp') {
-    if (gridArray[pacman - width].classList[0] !== 'wall') {
-      gridArray[pacman].classList.remove('pacman')
-      speed = 0
-      speed -= width
-      gridArray[pacman].classList.add('pacman')
+    //note - 1 is the current position, because arrays start at 0?
+    if (!mappedGridArray[pacman.y - 2][pacman.x - 1].classList.contains('wall')) {
+      mappedGridArray[pacman.y - 1][pacman.x - 1].classList.remove('pacman')
+      pacman.y -= playerSpeed
+      mappedGridArray[pacman.y - 1][pacman.x - 1].classList.add('pacman')
     }
   } else if (key === 's' || key === 'ArrowDown') {
-    if (gridArray[pacman + width].classList[0] !== 'wall') {
-      gridArray[pacman].classList.remove('pacman')
-      speed = 0
-      speed += width
-      gridArray[pacman].classList.add('pacman')
+    if (!mappedGridArray[pacman.y][pacman.x - 1].classList.contains('wall')) {
+      mappedGridArray[pacman.y - 1][pacman.x - 1].classList.remove('pacman')
+      pacman.y += playerSpeed
+      mappedGridArray[pacman.y - 1][pacman.x - 1].classList.add('pacman')
     }
   } else if (key === 'a' || key === 'ArrowLeft') {
-    if (gridArray[pacman - 1].classList[0] !== 'wall') {
-      gridArray[pacman].classList.remove('pacman')
-      speed = 0
-      speed = speed - 1
-      gridArray[pacman].classList.add('pacman')
+    if (!mappedGridArray[pacman.y - 1][pacman.x - 2].classList.contains('wall')) {
+      mappedGridArray[pacman.y - 1][pacman.x - 1].classList.remove('pacman')
+      pacman.x -= playerSpeed
+      mappedGridArray[pacman.y - 1][pacman.x - 1].classList.add('pacman')
     }
   } else if (key === 'd' || key === 'ArrowRight') {
-    if (gridArray[pacman + 1].classList[0] !== 'wall') {
-      gridArray[pacman].classList.remove('pacman')
-      speed = 0
-      speed = speed + 1
-      gridArray[pacman].classList.add('pacman')
+    if (!mappedGridArray[pacman.y - 1][pacman.x].classList.contains('wall')) {
+      mappedGridArray[pacman.y - 1][pacman.x - 1].classList.remove('pacman')
+      pacman.x += playerSpeed
+      mappedGridArray[pacman.y - 1][pacman.x - 1].classList.add('pacman')
     }
   }
 

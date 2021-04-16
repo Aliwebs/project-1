@@ -23,6 +23,7 @@ body {
 #game-window div {
   display: flex;
   align-items: center;
+  color: white;
 }
 
 .wall {
@@ -32,6 +33,7 @@ body {
 .empty {
   background-color: black;
 }
+
 
 .path .food {
   height: 5px;
