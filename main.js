@@ -3,6 +3,7 @@ const width = 25
 const height = (width + 3)
 let gridArray = []
 let score = 0
+const playerVelocity = { x: 0, y: 0 }
 //* MVP 
 // grey comments are guesses on how I could go about it
 
@@ -71,20 +72,19 @@ mappedGridArray.forEach(row => {
 })
 
 // ? start the game - loop 
-let playerSpeed = 0
+// let playerSpeed = 0
 setInterval(() => {
   //! pacman stops moving if it hits a wall while moving in a 
   //! given direction until player turns pacman
   //check if the next cell is a path
-  playerSpeed = 0
-  if (mappedGridArray[pacman.y - 1][pacman.x - 1].classList.contains('path')) {
-    mappedGridArray[pacman.y - 1][pacman.x - 1].classList.remove('pacman')
-    playerSpeed++
+  if (mappedGridArray[pacman.y + (playerVelocity.y)][pacman.x + (playerVelocity.x)].classList.contains('path')) {
+    mappedGridArray[pacman.y][pacman.x].classList.remove('pacman')
+    pacman.x += (playerVelocity.x)
+    pacman.y += (playerVelocity.y)
+    mappedGridArray[pacman.y][pacman.x].classList.add('pacman')
     //! pacman eats the food as it moves trough the maze
-    mappedGridArray[pacman.y - 1][pacman.x - 1].classList.add('pacman')
-    console.log(mappedGridArray[pacman.y - 1][pacman.x - 1].children[0].classList.contains('food'))
-    if (mappedGridArray[pacman.y - 1][pacman.x - 1].children[0].classList[0] === 'food') {
-      mappedGridArray[pacman.y - 1][pacman.x - 1].children[0].classList.remove('food')
+    if (mappedGridArray[pacman.y][pacman.x].children[0].classList[0] === 'food') {
+      mappedGridArray[pacman.y][pacman.x].children[0].classList.remove('food')
       //keep tracked of food eaten
       score++
     }
@@ -94,8 +94,8 @@ setInterval(() => {
 }, 500)
 //? spawn pacman in predifined location without any movement
 //span pacman under the ghost spawn box 
-let pacman = { y: 23, x: 13 }
-mappedGridArray[pacman.y - 1][pacman.x - 1].classList.add('pacman')
+const pacman = { y: 23, x: 13 }
+mappedGridArray[pacman.y][pacman.x].classList.add('pacman')
 
 
 
@@ -103,54 +103,76 @@ mappedGridArray[pacman.y - 1][pacman.x - 1].classList.add('pacman')
 //spawn 4 ghosts in the ghost box and make them exit with a delay of 2 seconds
 // each. i.e. second won't leave until first is gone for 2 seconds
 const ghosts = [{ y: 12, x: 13 }, { y: 14, x: 12 }, { y: 14, x: 13 }, { y: 14, x: 14 }]
-const ghostSpeed = [0, 0, 0, 0]
+const ghostSpeed = [{ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }]
 ghosts.forEach(ghost => {
-  mappedGridArray[ghost.y - 1][ghost.x - 1].classList.add('ghost')
-  mappedGridArray[ghost.y - 1][ghost.x - 1].children[0].classList.remove('food')
+  mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
+  mappedGridArray[ghost.y][ghost.x].children[0].classList.remove('food')
 })
 
 //? have ghosts move towards random directions in the grid
 // make ghosts move forward until they have to turn if there are 2 or more 
 // choices at an intersection choose randomly
 
-// setInterval(() => {
+setInterval(() => {
 
-//   ghostMove(ghosts[0], ghostSpeed[0])
+  ghostMove(ghosts[0], ghostSpeed[0])
 
-// }, 1000)
+}, 500)
 
 
-// function ghostMove(ghost, speeed) {
-//   //check if there is a path on the right and then move to the rigt
-//   //if a wall is found then call this function again
-//   let foundPath = false
-//   if (gridArray[ghost + 1].classList[0] !== 'wall' && !foundPath) {
-//     foundPath = true
-//     gridArray[ghost].classList.remove('ghost')
-//     speeed += speeed + 1
-//     gridArray[ghost].classList.add('ghost')
-//     //check if there is a path on the left
-//   }
-//   if (gridArray[ghost - 1].classList[0] !== 'wall' && !foundPath) {
-//     foundPath = true
-//     gridArray[ghost].classList.remove('ghost')
-//     speeed += speeed - 1
-//     gridArray[ghost].classList.add('ghost')
-//     //check if there is a path up
-//   }
-//   if (gridArray[ghost - width].classList[0] !== 'wall' && !foundPath) {
-//     foundPath = true
-//     gridArray[ghost].classList.remove('ghost')
-//     speeed -= width
-//     gridArray[ghost].classList.add('ghost')
-//   }
-//   if (gridArray[ghost + width].classList[0] !== 'wall' && !foundPath) {
-//     foundPath = true
-//     gridArray[ghost].classList.remove('ghost')
-//     speeed += width
-//     gridArray[ghost].classList.add('ghost')
-//   }
-// }
+function ghostMove(ghost, speed) {
+  if (mappedGridArray[ghost.y + (speed.y)][ghost.x + (speed.x)].classList.contains('path')) {
+    mappedGridArray[ghost.y][ghost.x].classList.remove('ghost')
+    console.log(speed)
+    ghost.x += (speed.x)
+    ghost.y += (speed.y)
+    mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
+  } else if (!mappedGridArray[ghost.y + (speed.y)][ghost.x + (speed.x)].classList.contains('path')) {
+    speed.x = 0
+    speed.y = 0
+    let foundPath = false
+    //check if there is a path on the right and then move to the rigt
+    //if a wall is found then call this function again
+    if (!mappedGridArray[ghost.y][ghost.x + 1].classList.contains('wall') && !foundPath) {
+      foundPath = true
+      mappedGridArray[ghost.y][ghost.x].classList.remove('ghost')
+      speed.y = 0
+      speed.x = 0
+      ghost.x += 1
+      speed.x = 1
+      mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
+      //check if there is a path down
+    } else if (!mappedGridArray[ghost.y + 1][ghost.x].classList.contains('wall') && !foundPath) {
+      foundPath = true
+      mappedGridArray[ghost.y][ghost.x].classList.remove('ghost')
+      speed.y = 0
+      speed.x = 0
+      ghost.y += 1
+      speed.y = 1
+      mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
+    }
+    //check if there is a path on the left
+    if (!mappedGridArray[ghost.y][ghost.x - 1].classList.contains('wall') && !foundPath) {
+      foundPath = true
+      mappedGridArray[ghost.y][ghost.x].classList.remove('ghost')
+      speed.y = 0
+      speed.x = 0
+      ghost.x -= 1
+      speed.x = -1
+      mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
+      //check if there is a path up
+    } else if (!mappedGridArray[ghost.y - 1][ghost.x].classList.contains('wall') && !foundPath) {
+      foundPath = true
+      mappedGridArray[ghost.y][ghost.x].classList.remove('ghost')
+      speed.y = 0
+      speed.x = 0
+      ghost.y -= 1
+      speed.y = -1
+      mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
+
+    }
+  }
+}
 
 
 
@@ -166,28 +188,41 @@ document.addEventListener('keydown', (e) => {
   const key = e.key
   if (key === 'w' || key === 'ArrowUp') {
     //note - 1 is the current position, because arrays start at 0?
-    if (!mappedGridArray[pacman.y - 2][pacman.x - 1].classList.contains('wall')) {
-      mappedGridArray[pacman.y - 1][pacman.x - 1].classList.remove('pacman')
-      pacman.y -= playerSpeed
-      mappedGridArray[pacman.y - 1][pacman.x - 1].classList.add('pacman')
+    if (!mappedGridArray[pacman.y - 1][pacman.x].classList.contains('wall') && playerVelocity.y !== -1) {
+      mappedGridArray[pacman.y][pacman.x].classList.remove('pacman')
+      playerVelocity.y = 0
+      playerVelocity.x = 0
+      pacman.y -= 1
+      playerVelocity.y = -1
+      mappedGridArray[pacman.y][pacman.x].classList.add('pacman')
     }
   } else if (key === 's' || key === 'ArrowDown') {
-    if (!mappedGridArray[pacman.y][pacman.x - 1].classList.contains('wall')) {
-      mappedGridArray[pacman.y - 1][pacman.x - 1].classList.remove('pacman')
-      pacman.y += playerSpeed
-      mappedGridArray[pacman.y - 1][pacman.x - 1].classList.add('pacman')
+    if (!mappedGridArray[pacman.y + 1][pacman.x].classList.contains('wall') && playerVelocity.y !== 1) {
+      mappedGridArray[pacman.y][pacman.x].classList.remove('pacman')
+      playerVelocity.y = 0
+      playerVelocity.x = 0
+      pacman.y += 1
+      playerVelocity.y = 1
+      mappedGridArray[pacman.y][pacman.x].classList.add('pacman')
     }
   } else if (key === 'a' || key === 'ArrowLeft') {
-    if (!mappedGridArray[pacman.y - 1][pacman.x - 2].classList.contains('wall')) {
-      mappedGridArray[pacman.y - 1][pacman.x - 1].classList.remove('pacman')
-      pacman.x -= playerSpeed
-      mappedGridArray[pacman.y - 1][pacman.x - 1].classList.add('pacman')
+    if (!mappedGridArray[pacman.y][pacman.x - 1].classList.contains('wall') && playerVelocity.x !== -1) {
+      mappedGridArray[pacman.y][pacman.x].classList.remove('pacman')
+      playerVelocity.y = 0
+      playerVelocity.x = 0
+      pacman.x -= 1
+      playerVelocity.x = -1
+
+      mappedGridArray[pacman.y][pacman.x].classList.add('pacman')
     }
   } else if (key === 'd' || key === 'ArrowRight') {
-    if (!mappedGridArray[pacman.y - 1][pacman.x].classList.contains('wall')) {
-      mappedGridArray[pacman.y - 1][pacman.x - 1].classList.remove('pacman')
-      pacman.x += playerSpeed
-      mappedGridArray[pacman.y - 1][pacman.x - 1].classList.add('pacman')
+    if (!mappedGridArray[pacman.y][pacman.x + 1].classList.contains('wall') && playerVelocity.x !== 1) {
+      mappedGridArray[pacman.y][pacman.x].classList.remove('pacman')
+      playerVelocity.y = 0
+      playerVelocity.x = 0
+      pacman.x += 1
+      playerVelocity.x = 1
+      mappedGridArray[pacman.y][pacman.x].classList.add('pacman')
     }
   }
 

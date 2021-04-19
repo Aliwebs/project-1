@@ -2,21 +2,26 @@
   box-sizing: border-box;
 }
 
+:root {
+  --cellWidth: ;
+  --cellHeight: ;
+}
+
 body {
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  margin: 0
+  margin: 0;
 }
 
 #game-window {
   display: flex;
   flex-flow: row wrap;
   border: 2px solid yellow;
-  height: 100%;
-  width: 1000px;
+  height: 800px;
+  width: 800px;
   background-color: black;
 }
 
@@ -24,6 +29,8 @@ body {
   display: flex;
   align-items: center;
   color: white;
+  width: calc(var(--cellWidth) * 1%);
+  width: calc(var(--cellHeight) * 1%);
 }
 
 .wall {
