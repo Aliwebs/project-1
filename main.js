@@ -1,11 +1,54 @@
 const grid = document.querySelector('#game-window')
 const width = 25
 const height = (width + 3)
-let gridArray = []
+let gridArray = new Array()
 let score = 0
-const playerVelocity = { x: 0, y: 0 }
+
 //* MVP 
 // grey comments are guesses on how I could go about it
+
+const pacman = {
+  x: 13,
+  y: 23,
+  speed: { x: 0, y: 0 },
+  move() {
+    if (mappedGridArray[this.y + (this.speed.y)][this.x + (this.speed.x)].classList.contains('path')) {
+      mappedGridArray[this.y][this.x].classList.remove('pacman')
+      this.x += (this.speed.x)
+      this.y += (this.speed.y)
+      mappedGridArray[this.y][this.x].classList.add('pacman')
+    }
+  },
+  eatFood() {
+
+  },
+  spawn() {
+    mappedGridArray[this.y][this.x].classList.add('pacman')
+    return this
+  },
+}
+
+
+function ghost(y, x) {
+  return {
+    x: x,
+    y: y,
+    speed: { x: 0, y: 0 },
+    move() {
+      //remove the ghost from current position
+      mappedGridArray[this.y][this.x].classList.remove('ghost')
+      //moves ghost in that direction
+      this.x += (this.speed.x)
+      this.y += (this.speed.y)
+      //add ghost on new position
+      mappedGridArray[this.y][this.x].classList.add('ghost')
+    },
+    spawn() {
+      mappedGridArray[this.y][this.x].classList.add('ghost')
+      return this
+    },
+  }
+}
 
 
 //? create a grid 
@@ -32,6 +75,7 @@ const mappedGridArray = createMap(height, width)
 map2.forEach((coordinate) => {
   mappedGridArray[coordinate[0]][coordinate[1]].classList.add('wall')
 })
+
 
 // gives the class empty to all other boxes outside player path 
 map1Exclude.forEach(number => {
@@ -87,64 +131,33 @@ mappedGridArray.forEach(row => {
 //   }
 // }
 
-setInterval(() => {
-  //! pacman stops moving if it hits a wall while moving in a 
-  //! given direction until player turns pacman
-  //check if the next cell is a path
-  if (mappedGridArray[pacman.y + (playerVelocity.y)][pacman.x + (playerVelocity.x)].classList.contains('path')) {
-    mappedGridArray[pacman.y][pacman.x].classList.remove('pacman')
-    pacman.x += (playerVelocity.x)
-    pacman.y += (playerVelocity.y)
-    mappedGridArray[pacman.y][pacman.x].classList.add('pacman')
-    // eatFood()
-  }
-}, 500)
+
 //? spawn pacman in predifined location without any movement
 //span pacman under the ghost spawn box 
-const pacman = { y: 23, x: 13 }
-mappedGridArray[pacman.y][pacman.x].classList.add('pacman')
+pacman.spawn()
 
 
 
 //? spawn 4 ghosts in spawn box
 //spawn 4 ghosts in the ghost box and make them exit with a delay of 2 seconds
 // each. i.e. second won't leave until first is gone for 2 seconds
-const ghosts = [{ y: 12, x: 13 }, { y: 14, x: 12 }, { y: 14, x: 13 }, { y: 14, x: 14 }]
-const ghostSpeed = [{ x: 1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 0 }, { x: 0, y: 0 }]
-ghosts.forEach(ghost => {
-  mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
-  mappedGridArray[ghost.y][ghost.x].children[0].classList.remove('food')
-})
-
-//? have ghosts move towards random directions in the grid
-// make ghosts move forward until they have to turn if there are 2 or more 
-// choices at an intersection choose randomly
+const clyde = ghost(12, 13).spawn()
+const blinky = ghost(14, 12).spawn()
+const pinky = ghost(14, 13).spawn()
+const inky = ghost(14, 14).spawn()
 
 setInterval(() => {
+  //! pacman stops moving if it hits a wall while moving in a 
+  //! given direction until player turns pacman
+  //check if the next cell is a path
+  pacman.move()
 
-  changeDirection(0)
+  //? have ghosts move towards random directions in the grid
+  // make ghosts move forward until they have to turn if there are 2 or more 
+  // choices at an intersection choose randomly
+  changeDirection(clyde)
 
 }, 500)
-
-
-
-
-
-
-// function changeDirection(orientation, ghost, speed) {
-//   if (!mappedGridArray[ghosts[ghost].y + (orientation.y)][ghosts[ghost].x + (orientation.x)].classList.contains('wall')) {
-//     mappedGridArray[ghosts[ghost].y][ghosts[ghost].x].classList.remove('ghost')
-//     ghostSpeed[ghost].y = 0
-//     ghostSpeed[ghost].x = 0
-//     ghosts[ghost].y += (orientation.y)
-//     ghosts[ghost].x += (orientation.x)
-//     ghostSpeed[ghost].y = orientation.y
-//     ghostSpeed[ghost].x = orientation.x
-//     mappedGridArray[ghosts[ghost].y][ghosts[ghost].x].classList.add('ghost')
-//   }
-// }
-
-
 
 
 
@@ -153,34 +166,34 @@ function checkDirection(availableDirections, ghost) {
 
 
   //check if there is a path up
-  if (!mappedGridArray[ghosts[ghost].y - 1][ghosts[ghost].x].classList.contains('wall') && availableDirections.includes('up')) {
-    ghostSpeed[ghost].x = 0
-    ghostSpeed[ghost].y = -1
+  if (!mappedGridArray[ghost.y - 1][ghost.x].classList.contains('wall') && availableDirections.includes('up')) {
+    ghost.speed.x = 0
+    ghost.speed.y = -1
     //check if there is a path on the right and then move to the rigt
     //if a wall is found then call this function again
-  } else if (!mappedGridArray[ghosts[ghost].y][ghosts[ghost].x + 1].classList.contains('wall') && availableDirections.includes('right')) {
-    ghostSpeed[ghost].y = 0
-    ghostSpeed[ghost].x = 1
+  } else if (!mappedGridArray[ghost.y][ghost.x + 1].classList.contains('wall') && availableDirections.includes('right')) {
+    ghost.speed.y = 0
+    ghost.speed.x = 1
     //check if there is a path down
-  } else if (!mappedGridArray[ghosts[ghost].y + 1][ghosts[ghost].x].classList.contains('wall') && availableDirections.includes('down')) {
-    ghostSpeed[ghost].x = 0
-    ghostSpeed[ghost].y = 1
+  } else if (!mappedGridArray[ghost.y + 1][ghost.x].classList.contains('wall') && availableDirections.includes('down')) {
+    ghost.speed.x = 0
+    ghost.speed.y = 1
     //check if there is a path on the left
-  } else if (!mappedGridArray[ghosts[ghost].y][ghosts[ghost].x - 1].classList.contains('wall') && availableDirections.includes('left')) {
-    ghostSpeed[ghost].y = 0
-    ghostSpeed[ghost].x = -1
+  } else if (!mappedGridArray[ghost.y][ghost.x - 1].classList.contains('wall') && availableDirections.includes('left')) {
+    ghost.speed.y = 0
+    ghost.speed.x = -1
   }
 }
 
 // store current direction in a variable
 function setDirection(ghost) {
-  if (ghostSpeed[ghost].x === -1) {
+  if (ghost.speed.x === -1) {
     return 'left'
-  } else if (ghostSpeed[ghost].x === 1) {
+  } else if (ghost.speed.x === 1) {
     return 'right'
-  } else if (ghostSpeed[ghost].y === -1) {
+  } else if (ghost.speed.y === -1) {
     return 'up'
-  } else if (ghostSpeed[ghost].y === 1) {
+  } else if (ghost.speed.y === 1) {
     return 'down'
   }
 }
@@ -196,20 +209,8 @@ function availableDirections(ghost) {
 }
 
 function changeDirection(ghost) {
-  //warps from one side to another if ghost goes into the tunnel
-  if (ghosts[ghost].y === 14 && ghosts[ghost].x === 25) {
-    mappedGridArray[ghosts[ghost].y][ghosts[ghost].x].classList.remove('ghost')
-    ghosts[ghost].x = 1
-    mappedGridArray[14][1].classList.add('ghost')
-  } else if (ghosts[ghost].y === 14 && ghosts[ghost].x === 1) {
-    mappedGridArray[ghosts[ghost].y][ghosts[ghost].x].classList.remove('ghost')
-    ghosts[ghost].x = 25
-    mappedGridArray[14][25].classList.add('ghost')
-  }
-  console.log(ghosts[ghost], mappedGridArray[ghosts[ghost].y][ghosts[ghost].x])
-
   // check if the path ahead is not a wall
-  if (mappedGridArray[ghosts[ghost].y + (ghostSpeed[ghost].y)][ghosts[ghost].x + (ghostSpeed[ghost].x)].classList.contains('path')) {
+  if (mappedGridArray[ghost.y + (ghost.speed.y)][ghost.x + (ghost.speed.x)].classList.contains('path')) {
     //for each block that the ghost is at give me all available directions
     const difAvailableDirections = availableDirections(ghost)
 
@@ -218,76 +219,50 @@ function changeDirection(ghost) {
     difAvailableDirections.sort()
     const randomChoice = Math.floor(Math.random() * difAvailableDirections.length)
     checkDirection([difAvailableDirections[randomChoice]], ghost)
-    ghostMove(ghost)
-  } else if (!mappedGridArray[ghosts[ghost].y + (ghostSpeed[ghost].y)][ghosts[ghost].x + (ghostSpeed[ghost].x)].classList.contains('path')) {
+    ghost.move()
+  } else if (!mappedGridArray[ghost.y + (ghost.speed.y)][ghost.x + (ghost.speed.x)].classList.contains('path')) {
     checkDirection(availableDirections(ghost), ghost)
-    ghostMove(ghost)
+    ghost.move()
   }
 }
 
-
-
-function ghostMove(ghost) {
-  //remove the ghost from current position
-  mappedGridArray[ghosts[ghost].y][ghosts[ghost].x].classList.remove('ghost')
-  //moves ghost in that direction
-  ghosts[ghost].x += (ghostSpeed[ghost].x)
-  ghosts[ghost].y += (ghostSpeed[ghost].y)
-  //add ghost on new position
-  mappedGridArray[ghosts[ghost].y][ghosts[ghost].x].classList.add('ghost')
-}
-
-
-//check if there is a path on the bottom
 
 
 
 //? listen to player input and turn packman accoridngly
 // listen to player input allow players to play with either W/A/S/D or arrow keys
+function pacmanChangeDirectionOnInput() {
+  document.addEventListener('keydown', (e) => {
+    //get keypressed
+    const key = e.key
+    //check which key it was and check if the tile to move is not a wall 
+    // change speed x and y values accordingly
+    //also check if the key has been pressed already
+    if (key === 'w' || key === 'ArrowUp') {
+      if (!mappedGridArray[pacman.y - 1][pacman.x].classList.contains('wall') && pacman.speed.y !== -1) {
+        pacman.speed.x = 0
+        pacman.speed.y = -1
+      }
+    } else if (key === 's' || key === 'ArrowDown') {
+      if (!mappedGridArray[pacman.y + 1][pacman.x].classList.contains('wall') && pacman.speed.y !== 1) {
+        pacman.speed.x = 0
+        pacman.speed.y = 1
+      }
+    } else if (key === 'a' || key === 'ArrowLeft') {
+      if (!mappedGridArray[pacman.y][pacman.x - 1].classList.contains('wall') && pacman.speed.x !== -1) {
+        pacman.speed.y = 0
+        pacman.speed.x = -1
+      }
+    } else if (key === 'd' || key === 'ArrowRight') {
+      if (!mappedGridArray[pacman.y][pacman.x + 1].classList.contains('wall') && pacman.speed.x !== 1) {
+        pacman.speed.y = 0
+        pacman.speed.x = 1
+      }
+    }
 
-document.addEventListener('keydown', (e) => {
-  const key = e.key
-  if (key === 'w' || key === 'ArrowUp') {
-    //note - 1 is the current position, because arrays start at 0?
-    if (!mappedGridArray[pacman.y - 1][pacman.x].classList.contains('wall') && playerVelocity.y !== -1) {
-      mappedGridArray[pacman.y][pacman.x].classList.remove('pacman')
-      playerVelocity.y = 0
-      playerVelocity.x = 0
-      pacman.y -= 1
-      playerVelocity.y = -1
-      mappedGridArray[pacman.y][pacman.x].classList.add('pacman')
-    }
-  } else if (key === 's' || key === 'ArrowDown') {
-    if (!mappedGridArray[pacman.y + 1][pacman.x].classList.contains('wall') && playerVelocity.y !== 1) {
-      mappedGridArray[pacman.y][pacman.x].classList.remove('pacman')
-      playerVelocity.y = 0
-      playerVelocity.x = 0
-      pacman.y += 1
-      playerVelocity.y = 1
-      mappedGridArray[pacman.y][pacman.x].classList.add('pacman')
-    }
-  } else if (key === 'a' || key === 'ArrowLeft') {
-    if (!mappedGridArray[pacman.y][pacman.x - 1].classList.contains('wall') && playerVelocity.x !== -1) {
-      mappedGridArray[pacman.y][pacman.x].classList.remove('pacman')
-      playerVelocity.y = 0
-      playerVelocity.x = 0
-      pacman.x -= 1
-      playerVelocity.x = -1
+  })
 
-      mappedGridArray[pacman.y][pacman.x].classList.add('pacman')
-    }
-  } else if (key === 'd' || key === 'ArrowRight') {
-    if (!mappedGridArray[pacman.y][pacman.x + 1].classList.contains('wall') && playerVelocity.x !== 1) {
-      mappedGridArray[pacman.y][pacman.x].classList.remove('pacman')
-      playerVelocity.y = 0
-      playerVelocity.x = 0
-      pacman.x += 1
-      playerVelocity.x = 1
-      mappedGridArray[pacman.y][pacman.x].classList.add('pacman')
-    }
-  }
-
-})
+}
 
 
 

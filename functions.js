@@ -26,7 +26,7 @@ function cell(x, y) {
   div.style.width = `${100 / width}%`
   div.style.height = `${100 / height}%`
   //set the div id to the cell's x and y coordinates
-  div.setAttribute('id', `${x}:${y}`)
+  div.setAttribute('id', `${y}:${x}`)
   // div.innerText = `${x + 1}:${y + 1}`
   //append div to the grid
   grid.appendChild(div)
