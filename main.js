@@ -103,7 +103,7 @@ mappedGridArray[pacman.y][pacman.x].classList.add('pacman')
 //spawn 4 ghosts in the ghost box and make them exit with a delay of 2 seconds
 // each. i.e. second won't leave until first is gone for 2 seconds
 const ghosts = [{ y: 12, x: 13 }, { y: 14, x: 12 }, { y: 14, x: 13 }, { y: 14, x: 14 }]
-const ghostSpeed = [{ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }]
+const ghostSpeed = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 0 }]
 ghosts.forEach(ghost => {
   mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
   mappedGridArray[ghost.y][ghost.x].children[0].classList.remove('food')
@@ -116,65 +116,136 @@ ghosts.forEach(ghost => {
 setInterval(() => {
 
   ghostMove(ghosts[0], ghostSpeed[0])
+  ghostMove(ghosts[1], ghostSpeed[1])
+  ghostMove(ghosts[2], ghostSpeed[2])
+  ghostMove(ghosts[3], ghostSpeed[3])
 
 }, 500)
 
 
+
+
+
+
+// function changeDirection(orientation, ghost, speed) {
+//   if (!mappedGridArray[ghost.y + (orientation.y)][ghost.x + (orientation.x)].classList.contains('wall')) {
+//     mappedGridArray[ghost.y][ghost.x].classList.remove('ghost')
+//     speed.y = 0
+//     speed.x = 0
+//     ghost.y += (orientation.y)
+//     ghost.x += (orientation.x)
+//     speed.y = orientation.y
+//     speed.x = orientation.x
+//     mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
+//   }
+// }
+
+
+
+
+
+// if a path is found then move there
+
+
+function checkDirection(availableDirections, ghost, speed) {
+
+  let foundPath = false
+  // check all the other directions except the current one
+  console.log(availableDirections)
+  // availableDirections.forEach(dir => {
+  //   if (dir === 'up') {
+  //     changeDirection({ x: 0, y: -1 }, ghost, speed)
+  //   } else if (dir === 'down') {
+  //     changeDirection({ x: 0, y: 1 }, ghost, speed)
+  //   } if (dir === 'left') {
+  //     changeDirection({ x: -1, y: 0 }, ghost, speed)
+  //   } if (dir === 'up') {
+  //     changeDirection({ x: 1, y: 0 }, ghost, speed)
+  //   }
+  // })
+
+  //check if there is a path up
+  if (!mappedGridArray[ghost.y - 1][ghost.x].classList.contains('wall') && !foundPath && availableDirections.includes('up')) {
+    foundPath = true
+    mappedGridArray[ghost.y][ghost.x].classList.remove('ghost')
+    speed.y = 0
+    speed.x = 0
+    ghost.y -= 1
+    speed.y = -1
+    mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
+
+  }
+  //check if there is a path on the right and then move to the rigt
+  //if a wall is found then call this function again
+  if (!mappedGridArray[ghost.y][ghost.x + 1].classList.contains('wall') && !foundPath && availableDirections.includes('right')) {
+    foundPath = true
+    mappedGridArray[ghost.y][ghost.x].classList.remove('ghost')
+    speed.y = 0
+    speed.x = 0
+    ghost.x += 1
+    speed.x = 1
+    mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
+
+  }
+  //check if there is a path down
+  if (!mappedGridArray[ghost.y + 1][ghost.x].classList.contains('wall') && !foundPath && availableDirections.includes('down')) {
+    foundPath = true
+    mappedGridArray[ghost.y][ghost.x].classList.remove('ghost')
+    speed.y = 0
+    speed.x = 0
+    ghost.y += 1
+    speed.y = 1
+    mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
+  }
+  //check if there is a path on the left
+  if (!mappedGridArray[ghost.y][ghost.x - 1].classList.contains('wall') && !foundPath && availableDirections.includes('left')) {
+    foundPath = true
+    mappedGridArray[ghost.y][ghost.x].classList.remove('ghost')
+    speed.y = 0
+    speed.x = 0
+    ghost.x -= 1
+    speed.x = -1
+    mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
+
+  }
+
+}
+
+// store current direction in a variable
+function setDirection(speed) {
+  if (speed.x === -1) {
+    return 'left'
+  } else if (speed.x === 1) {
+    return 'right'
+  } else if (speed.y === -1) {
+    return 'up'
+  } else if (speed.y === 1) {
+    return 'down'
+  }
+}
+
+function availableDirections() {
+  const direction = setDirection(ghostSpeed[0])
+  if (direction === 'up' || direction === 'down') {
+    return ['left', 'right']
+  } else if (direction === 'left' || direction === 'right') {
+    return ['down', 'up']
+  }
+}
+
 function ghostMove(ghost, speed) {
+  // check if the path ahead is not a wall
   if (mappedGridArray[ghost.y + (speed.y)][ghost.x + (speed.x)].classList.contains('path')) {
     mappedGridArray[ghost.y][ghost.x].classList.remove('ghost')
+    //moves ghost in that direction
     console.log(speed)
     ghost.x += (speed.x)
     ghost.y += (speed.y)
     mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
   } else if (!mappedGridArray[ghost.y + (speed.y)][ghost.x + (speed.x)].classList.contains('path')) {
-    speed.x = 0
-    speed.y = 0
-    let foundPath = false
-    //check if there is a path on the right and then move to the rigt
-    //if a wall is found then call this function again
-    if (!mappedGridArray[ghost.y][ghost.x + 1].classList.contains('wall') && !foundPath) {
-      foundPath = true
-      mappedGridArray[ghost.y][ghost.x].classList.remove('ghost')
-      speed.y = 0
-      speed.x = 0
-      ghost.x += 1
-      speed.x = 1
-      mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
-      //check if there is a path down
-    } else if (!mappedGridArray[ghost.y + 1][ghost.x].classList.contains('wall') && !foundPath) {
-      foundPath = true
-      mappedGridArray[ghost.y][ghost.x].classList.remove('ghost')
-      speed.y = 0
-      speed.x = 0
-      ghost.y += 1
-      speed.y = 1
-      mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
-    }
-    //check if there is a path on the left
-    if (!mappedGridArray[ghost.y][ghost.x - 1].classList.contains('wall') && !foundPath) {
-      foundPath = true
-      mappedGridArray[ghost.y][ghost.x].classList.remove('ghost')
-      speed.y = 0
-      speed.x = 0
-      ghost.x -= 1
-      speed.x = -1
-      mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
-      //check if there is a path up
-    } else if (!mappedGridArray[ghost.y - 1][ghost.x].classList.contains('wall') && !foundPath) {
-      foundPath = true
-      mappedGridArray[ghost.y][ghost.x].classList.remove('ghost')
-      speed.y = 0
-      speed.x = 0
-      ghost.y -= 1
-      speed.y = -1
-      mappedGridArray[ghost.y][ghost.x].classList.add('ghost')
-
-    }
+    checkDirection(availableDirections(), ghost, speed)
   }
 }
-
-
 
 
 //check if there is a path on the bottom
