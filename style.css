@@ -97,7 +97,7 @@ body {
   }
 }
 
-.ghost.ghostBlink {
+.ghostBlink {
   background-color: white;
   animation-name: switchColor;
   animation-duration: 1s;

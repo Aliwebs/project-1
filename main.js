@@ -5,7 +5,18 @@ let gridArray = new Array()
 const displayScore = document.querySelector('#score')
 let score = 0
 let isPlaying = true
+let clyde = {}
+let blinky = {}
+let pinky = {}
+let inky = {}
+const ghostsList = {
+  clyde: [12, 13, 'clyde'],
+  blinky: [14, 12, 'blinky'],
+  pinky: [14, 13, 'pinky'],
+  inky: [14, 14, 'inky'],
+}
 
+const runSpeed = 500
 //* MVP 
 // grey comments are guesses on how I could go about it
 
@@ -15,15 +26,23 @@ const pacman = {
   y: 23,
   //current x and y speed
   speed: { x: 0, y: 0 },
+  bigFood: false,
   //move function removes the span element from current and moves player by x and y speed 
   //then places player there
   move() {
-    if (mappedGridArray[this.y + (this.speed.y)][this.x + (this.speed.x)].classList.contains('path')) {
+    if (!mappedGridArray[this.y + (this.speed.y)][this.x + (this.speed.x)].classList.contains('wall')) {
       this.remove()
       this.x += (this.speed.x)
       this.y += (this.speed.y)
       this.spawn()
     }
+
+    if (mappedGridArray[this.y][this.x].querySelector('.ghostBlink') !== null) {
+      const ghostId = mappedGridArray[this.y][this.x].querySelector('.ghostBlink').getAttribute('id')
+      mappedGridArray[this.y][this.x].querySelector('.ghostBlink').remove()
+      // ${ ghostId } = ghost(ghostsList[ghostId[0]], ghostsList[ghostId][1], ghostsList[ghostId][2]).spawn()
+    }
+
     //I check if pacman hit a ghost if they did then display score and stop interval 
     if (mappedGridArray[this.y][this.x].querySelector('.ghost') !== null) {
       console.log('you loose')
@@ -49,11 +68,11 @@ const pacman = {
     }
     if (mappedGridArray[this.y][this.x].querySelector('.bigFood') !== null) {
       mappedGridArray[this.y][this.x].querySelector('.bigFood').remove('bigFood')
-      console.log('big food')
-      clyde.blinking()
-      blinky.blinking()
-      pinky.blinking()
-      inky.blinking()
+      this.bigFood = true
+      // clyde.blinking()
+      // blinky.blinking()
+      // pinky.blinking()
+      // inky.blinking()
     }
   },
   spawn() {
@@ -69,26 +88,34 @@ const pacman = {
 }
 
 
-function ghost(y, x) {
+function ghost(y, x, name) {
   return {
+    name: name,
     x: x,
     y: y,
     speed: { x: 1, y: 0 },
     visited: [],
     move() {
       //remove the ghost from current position
-      mappedGridArray[this.y][this.x].children[1].remove()
+      mappedGridArray[this.y][this.x].querySelector('.ghost').remove()
       //moves ghost in that direction
       this.x += (this.speed.x)
       this.y += (this.speed.y)
       //add ghost on new position
       this.spawn()
+      if (pacman.bigFood) {
+        clyde.blinking()
+        blinky.blinking()
+        pinky.blinking()
+        inky.blinking()
+      }
       //add position to visited
       this.visited.push(`${this.y}:${this.x}`)
     },
     spawn() {
       const ghostSprite = document.createElement('span')
       ghostSprite.classList.add('ghost')
+      ghostSprite.setAttribute('id', name)
       mappedGridArray[this.y][this.x].appendChild(ghostSprite)
       return this
     },
@@ -96,9 +123,10 @@ function ghost(y, x) {
       mappedGridArray[this.y][this.x].querySelector('.ghost').remove()
     },
     blinking() {
-      const ghost = mappedGridArray[this.y][this.x].querySelector('.ghost')
-      ghost.classList.add('ghostBlink')
-      console.log(ghost)
+      if (mappedGridArray[this.y][this.x].querySelector('.ghost') !== null) {
+        const ghost = mappedGridArray[this.y][this.x].querySelector('.ghost')
+        ghost.classList.add('ghostBlink')
+      }
     },
   }
 }
@@ -161,7 +189,7 @@ mappedGridArray.forEach(row => {
   })
 })
 
-const bigFoodCord = [[5, 2], [5, 24], [22, 2], [22, 24]]
+const bigFoodCord = [[5, 2], [5, 24], [22, 2], [23, 10]]
 
 bigFoodCord.forEach(bigFood => {
   const element = mappedGridArray[bigFood[0]][bigFood[1]].querySelector('.food')
@@ -181,10 +209,10 @@ pacman.spawn()
 //? spawn 4 ghosts in spawn box
 //spawn 4 ghosts in the ghost box and make them exit with a delay of 2 seconds
 // each. i.e. second won't leave until first is gone for 2 seconds
-const clyde = ghost(12, 13).spawn()
-const blinky = ghost(14, 12).spawn()
-const pinky = ghost(14, 13).spawn()
-const inky = ghost(14, 14).spawn()
+clyde = ghost(ghostsList.clyde[0], ghostsList.clyde[1], ghostsList.clyde[2]).spawn()
+blinky = ghost(ghostsList.blinky[0], ghostsList.blinky[1], ghostsList.blinky[2]).spawn()
+pinky = ghost(ghostsList.pinky[0], ghostsList.pinky[1], ghostsList.pinky[2]).spawn()
+inky = ghost(ghostsList.inky[0], ghostsList.inky[1], ghostsList.inky[2]).spawn()
 
 const myInterval = setInterval(() => {
   //! pacman stops moving if it hits a wall while moving in a 
@@ -200,29 +228,40 @@ const myInterval = setInterval(() => {
   changeDirection(pinky)
   changeDirection(inky)
 
-}, 500)
+}, runSpeed)
 
 
 
 // if a path is found then move there
 function checkDirection(availableDirections, ghost) {
-
+  const cellUp = mappedGridArray[ghost.y - 1][ghost.x]
+  const cellDown = mappedGridArray[ghost.y + 1][ghost.x]
+  const cellLeft = mappedGridArray[ghost.y][ghost.x - 1]
+  const cellRight = mappedGridArray[ghost.y][ghost.x + 1]
 
   //check if there is a path up
-  if (!mappedGridArray[ghost.y - 1][ghost.x].classList.contains('wall') && availableDirections.includes('up')) {
+  if (!cellUp.classList.contains('wall')
+    && availableDirections.includes('up')
+    && cellUp.querySelector('.ghost') === null) {
     ghost.speed.x = 0
     ghost.speed.y = -1
     //check if there is a path on the right and then move to the rigt
     //if a wall is found then call this function again
-  } else if (!mappedGridArray[ghost.y][ghost.x + 1].classList.contains('wall') && availableDirections.includes('right')) {
+  } else if (!cellRight.classList.contains('wall')
+    && availableDirections.includes('right')
+    && cellRight.querySelector('.ghost') === null) {
     ghost.speed.y = 0
     ghost.speed.x = 1
     //check if there is a path down
-  } else if (!mappedGridArray[ghost.y + 1][ghost.x].classList.contains('wall') && availableDirections.includes('down')) {
+  } else if (!cellDown.classList.contains('wall')
+    && availableDirections.includes('down')
+    && cellDown.querySelector('.ghost') === null) {
     ghost.speed.x = 0
     ghost.speed.y = 1
     //check if there is a path on the left
-  } else if (!mappedGridArray[ghost.y][ghost.x - 1].classList.contains('wall') && availableDirections.includes('left')) {
+  } else if (!cellLeft.classList.contains('wall')
+    && availableDirections.includes('left')
+    && cellLeft.querySelector('.ghost') === null) {
     ghost.speed.y = 0
     ghost.speed.x = -1
   }
