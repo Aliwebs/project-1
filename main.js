@@ -2,29 +2,69 @@ const grid = document.querySelector('#game-window')
 const width = 25
 const height = (width + 3)
 let gridArray = new Array()
+const displayScore = document.querySelector('#score')
 let score = 0
+let isPlaying = true
 
 //* MVP 
 // grey comments are guesses on how I could go about it
 
 const pacman = {
+  //here x and y are the current coordinates
   x: 13,
   y: 23,
+  //current x and y speed
   speed: { x: 0, y: 0 },
+  //move function removes the span element from current and moves player by x and y speed 
+  //then places player there
   move() {
     if (mappedGridArray[this.y + (this.speed.y)][this.x + (this.speed.x)].classList.contains('path')) {
-      mappedGridArray[this.y][this.x].classList.remove('pacman')
+      this.remove()
       this.x += (this.speed.x)
       this.y += (this.speed.y)
-      mappedGridArray[this.y][this.x].classList.add('pacman')
+      this.spawn()
+    }
+    //I check if pacman hit a ghost if they did then display score and stop interval 
+    if (mappedGridArray[this.y][this.x].querySelector('.ghost') !== null) {
+      console.log('you loose')
+      displayScore.innerHTML = `<em>Your loose!</em> score is: ${score}`
+      //! player loses if pacman hits a ghost
+      mappedGridArray[this.y][this.x].querySelector('pacman').remove()
+      clearInterval(myInterval)
     }
   },
   eatFood() {
-
+    //! pacman eats the food as it moves trough the maze
+    if (mappedGridArray[this.y][this.x].querySelector('.food') !== null) {
+      mappedGridArray[this.y][this.x].querySelector('.food').remove('food')
+      //increase score after eating food
+      score++
+      //display score
+      displayScore.innerHTML = `Your score is: ${score}`
+      //if they pick up all food then they win
+      if (document.querySelectorAll('.food').length - 10 === 0) {
+        displayScore.innerHTML = `<em>Your won!</em> score is: ${score}`
+        console.log('you won')
+      }
+    }
+    if (mappedGridArray[this.y][this.x].querySelector('.bigFood') !== null) {
+      mappedGridArray[this.y][this.x].querySelector('.bigFood').remove('bigFood')
+      console.log('big food')
+      clyde.blinking()
+      blinky.blinking()
+      pinky.blinking()
+      inky.blinking()
+    }
   },
   spawn() {
-    mappedGridArray[this.y][this.x].classList.add('pacman')
-    return this
+    const pacmanSprite = document.createElement('span')
+    pacmanSprite.classList.add('pacman')
+    mappedGridArray[this.y][this.x].appendChild(pacmanSprite)
+    pacmanChangeDirectionOnInput()
+    return pacmanSprite
+  },
+  remove() {
+    mappedGridArray[this.y][this.x].querySelector('.pacman').remove()
   },
 }
 
@@ -33,36 +73,36 @@ function ghost(y, x) {
   return {
     x: x,
     y: y,
-    speed: { x: 0, y: 0 },
+    speed: { x: 1, y: 0 },
+    visited: [],
     move() {
       //remove the ghost from current position
-      mappedGridArray[this.y][this.x].classList.remove('ghost')
+      mappedGridArray[this.y][this.x].children[1].remove()
       //moves ghost in that direction
       this.x += (this.speed.x)
       this.y += (this.speed.y)
       //add ghost on new position
-      mappedGridArray[this.y][this.x].classList.add('ghost')
+      this.spawn()
+      //add position to visited
+      this.visited.push(`${this.y}:${this.x}`)
     },
     spawn() {
-      mappedGridArray[this.y][this.x].classList.add('ghost')
+      const ghostSprite = document.createElement('span')
+      ghostSprite.classList.add('ghost')
+      mappedGridArray[this.y][this.x].appendChild(ghostSprite)
       return this
+    },
+    remove() {
+      mappedGridArray[this.y][this.x].querySelector('.ghost').remove()
+    },
+    blinking() {
+      const ghost = mappedGridArray[this.y][this.x].querySelector('.ghost')
+      ghost.classList.add('ghostBlink')
+      console.log(ghost)
     },
   }
 }
 
-
-//? create a grid 
-// create a grid how Nick did in lesson needs to be a lot more bigger and 
-// the grid itself will be hidden*
-
-// for (let i = 1; i <= width ** 2 + (width * 3); i++) {
-//   const div = document.createElement('div')
-//   div.style.width = `${100 / width}%`
-//   div.innerHTML = i
-//   div.style.height = `${100 / height}%`
-//   grid.appendChild(div)
-//   gridArray.push(div)
-// }
 
 // refer to ./functions.js file
 const mappedGridArray = createMap(height, width)
@@ -72,7 +112,7 @@ const mappedGridArray = createMap(height, width)
 // Add the board on top of the grid, this could be coordinates of where 
 // all the walls will go or viceversa
 // from the walls array gives the class wall to all walls
-map2.forEach((coordinate) => {
+map1.forEach((coordinate) => {
   mappedGridArray[coordinate[0]][coordinate[1]].classList.add('wall')
 })
 
@@ -86,6 +126,8 @@ map1Exclude.forEach(number => {
 
 
 // ? Code to create a static board
+
+//? Basically a map builder
 // let staticGrid = []
 
 // grid.addEventListener('click', (e) => {
@@ -119,23 +161,21 @@ mappedGridArray.forEach(row => {
   })
 })
 
+const bigFoodCord = [[5, 2], [5, 24], [22, 2], [22, 24]]
+
+bigFoodCord.forEach(bigFood => {
+  const element = mappedGridArray[bigFood[0]][bigFood[1]].querySelector('.food')
+  element.classList.remove('food')
+  element.classList.add('bigFood')
+})
+
 // ? start the game - loop 
 
-
-// function eatFood() {
-//   //! pacman eats the food as it moves trough the maze
-//   if ([pacman.y][pacman.x].children[0].classList.contains('food')) {
-//     mappedGridArray[pacman.y][pacman.x].children[0].classList.remove('food')
-//     //keep tracked of food eaten
-//     score++
-//   }
-// }
 
 
 //? spawn pacman in predifined location without any movement
 //span pacman under the ghost spawn box 
 pacman.spawn()
-
 
 
 //? spawn 4 ghosts in spawn box
@@ -146,16 +186,19 @@ const blinky = ghost(14, 12).spawn()
 const pinky = ghost(14, 13).spawn()
 const inky = ghost(14, 14).spawn()
 
-setInterval(() => {
+const myInterval = setInterval(() => {
   //! pacman stops moving if it hits a wall while moving in a 
   //! given direction until player turns pacman
-  //check if the next cell is a path
   pacman.move()
+  pacman.eatFood()
 
   //? have ghosts move towards random directions in the grid
-  // make ghosts move forward until they have to turn if there are 2 or more 
+  // make ghosts move in a given direction until they have to turn if there are 2 or more 
   // choices at an intersection choose randomly
   changeDirection(clyde)
+  changeDirection(blinky)
+  changeDirection(pinky)
+  changeDirection(inky)
 
 }, 500)
 
@@ -185,42 +228,37 @@ function checkDirection(availableDirections, ghost) {
   }
 }
 
-// store current direction in a variable
-function setDirection(ghost) {
-  if (ghost.speed.x === -1) {
-    return 'left'
-  } else if (ghost.speed.x === 1) {
-    return 'right'
-  } else if (ghost.speed.y === -1) {
-    return 'up'
-  } else if (ghost.speed.y === 1) {
-    return 'down'
-  }
-}
 
 function availableDirections(ghost) {
-  const direction = setDirection(ghost)
-  if (direction === 'down' || direction === 'up') {
-    return ['right', 'left']
-  } else if (direction === 'right' || direction === 'left') {
-    return ['up', 'down']
+  const array = new Array()
+  if (ghost.speed.x !== -1) {
+    array.push('left')
   }
-  return ['up', 'right', 'down', 'left']
+  if (ghost.speed.x !== 1) {
+    array.push('right')
+  }
+  if (ghost.speed.y !== -1) {
+    array.push('up')
+  }
+  if (ghost.speed.y !== 1) {
+    array.push('down')
+  }
+
+  return array
 }
 
 function changeDirection(ghost) {
   // check if the path ahead is not a wall
-  if (mappedGridArray[ghost.y + (ghost.speed.y)][ghost.x + (ghost.speed.x)].classList.contains('path')) {
+  if (!mappedGridArray[ghost.y + (ghost.speed.y)][ghost.x + (ghost.speed.x)].classList.contains('wall')) {
     //for each block that the ghost is at give me all available directions
     const difAvailableDirections = availableDirections(ghost)
 
     //if the available direction is more than one pick randomly between the two
     //change direction 
-    difAvailableDirections.sort()
     const randomChoice = Math.floor(Math.random() * difAvailableDirections.length)
     checkDirection([difAvailableDirections[randomChoice]], ghost)
     ghost.move()
-  } else if (!mappedGridArray[ghost.y + (ghost.speed.y)][ghost.x + (ghost.speed.x)].classList.contains('path')) {
+  } else if (mappedGridArray[ghost.y + (ghost.speed.y)][ghost.x + (ghost.speed.x)].classList.contains('wall')) {
     checkDirection(availableDirections(ghost), ghost)
     ghost.move()
   }
@@ -266,7 +304,7 @@ function pacmanChangeDirectionOnInput() {
 
 
 
-//! player loses if pacman hits a ghost
+
 
 //! player wins if pacman eats all the food in the level
 

@@ -2,11 +2,6 @@
   box-sizing: border-box;
 }
 
-:root {
-  --cellWidth: ;
-  --cellHeight: ;
-}
-
 body {
   height: 100vh;
   display: flex;
@@ -28,9 +23,8 @@ body {
 #game-window div {
   display: flex;
   align-items: center;
+  justify-content: center;
   color: white;
-  width: calc(var(--cellWidth) * 1%);
-  width: calc(var(--cellHeight) * 1%);
 }
 
 .wall {
@@ -51,14 +45,61 @@ body {
   display: inline-block;
 }
 
-.pacman {
+
+
+
+.path .bigFood {
+  height: 10px;
+  width: 10px;
+  margin: 0 auto;
   background-color: yellow;
-  border-radius: 100%;
+  border-radius: 50%;
+  display: inline-block;
 }
 
+.pacman {
+  height: 25px;
+  width: 25px;
+  margin: 0 auto;
+  background-color: yellow;
+  border-radius: 50%;
+  display: inline-block;
+  position: absolute;
+}
+
+
+
 .ghost {
-  border-top: 0.3px solid black;
+  height: 25px;
+  width: 25px;
+  margin: 0 auto;
   background-color: teal;
-  border-radius: 20%;
-  z-index: 10;
+  border-radius: 25%;
+  display: inline-block;
+  position: absolute;
+}
+
+@keyframes switchColor {
+  0% {
+    background-color: white;
+  }
+
+  50% {
+    background-color: blue;
+  }
+
+  75% {
+    background-color: white;
+  }
+
+  100% {
+    background-color: blue;
+  }
+}
+
+.ghost.ghostBlink {
+  background-color: white;
+  animation-name: switchColor;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
 }
