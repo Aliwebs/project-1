@@ -23,8 +23,8 @@ function cell(x, y) {
   //create a div
   const div = document.createElement('div')
   //set div width and height
-  div.style.width = `${100 / width}%`
-  div.style.height = `${100 / height}%`
+  div.style.width = `${100 / WIDTH}%`
+  div.style.height = `${100 / HEIGHT}%`
   //set the div id to the cell's x and y coordinates
   div.setAttribute('id', `${y}:${x}`)
   // div.innerText = `${x + 1}:${y + 1}`
@@ -34,3 +34,180 @@ function cell(x, y) {
   gridArray.push(div)
   return div
 }
+
+//? listen to player input and turn packman accoridngly
+// listen to player input allow players to play with either W/A/S/D or arrow keys
+function pacmanChangeDirectionOnInput() {
+  if (pacman.x === undefined || pacman.y === undefined) return
+  document.addEventListener('keydown', (e) => {
+    //get keypressed
+    const key = e.key
+    //check which key it was and check if the tile to move is not a wall 
+    // change speed x and y values accordingly
+    //also check if the key has been pressed already
+    if (key === 'w' || key === 'ArrowUp') {
+      if (!mappedGridArray[pacman.y - 1][pacman.x].classList.contains('wall') && pacman.speed.y !== -1) {
+        pacman.speed.x = 0
+        pacman.speed.y = -1
+      }
+    } else if (key === 's' || key === 'ArrowDown') {
+      if (!mappedGridArray[pacman.y + 1][pacman.x].classList.contains('wall') && pacman.speed.y !== 1) {
+        pacman.speed.x = 0
+        pacman.speed.y = 1
+      }
+    } else if (key === 'a' || key === 'ArrowLeft') {
+      if (!mappedGridArray[pacman.y][pacman.x - 1].classList.contains('wall') && pacman.speed.x !== -1) {
+        pacman.speed.y = 0
+        pacman.speed.x = -1
+      }
+    } else if (key === 'd' || key === 'ArrowRight') {
+      if (!mappedGridArray[pacman.y][pacman.x + 1].classList.contains('wall') && pacman.speed.x !== 1) {
+        pacman.speed.y = 0
+        pacman.speed.x = 1
+      }
+    }
+  })
+
+}
+
+
+//? listen to player input and turn packman accoridngly
+// listen to player input allow players to play with either W/A/S/D or arrow keys
+function pacmanChangeDirectionOnInput() {
+  if (pacman.x === undefined || pacman.y === undefined) return
+  document.addEventListener('keydown', (e) => {
+    //get keypressed
+    const key = e.key
+
+    let up, down, left, right
+
+    up = mappedGridArray[pacman.y - 1][pacman.x]
+    down = mappedGridArray[pacman.y + 1][pacman.x]
+    left = mappedGridArray[pacman.y][pacman.x - 1]
+    right = mappedGridArray[pacman.y][pacman.x + 1]
+
+    //check which key it was and check if the tile to move is not a wall 
+    // change speed x and y values accordingly
+    //also check if the key has been pressed already
+    if (key === 'w' || key === 'ArrowUp') {
+      if (!up.classList.contains('wall') && pacman.speed.y !== -1) {
+        pacman.speed.x = 0
+        pacman.speed.y = -1
+      }
+    } else if (key === 's' || key === 'ArrowDown') {
+      if (!down.classList.contains('wall') && pacman.speed.y !== 1) {
+        pacman.speed.x = 0
+        pacman.speed.y = 1
+      }
+    } else if (key === 'a' || key === 'ArrowLeft') {
+      if (!left.classList.contains('wall') && pacman.speed.x !== -1) {
+        pacman.speed.y = 0
+        pacman.speed.x = -1
+      }
+    } else if (key === 'd' || key === 'ArrowRight') {
+      if (!right.classList.contains('wall') && pacman.speed.x !== 1) {
+        pacman.speed.y = 0
+        pacman.speed.x = 1
+      }
+    }
+  })
+
+}
+
+
+
+//? Spawn all ghosts function
+function spawnGhosts(ghostName) {
+  //checks if no argument was given, if that is the case spawns all ghosts
+  if (ghostName === undefined) {
+    activeGhosts.push(ghost(12, 13, 0).spawn())
+    activeGhosts.push(ghost(14, 12, 1).spawn())
+    activeGhosts.push(ghost(14, 13, 2).spawn())
+    activeGhosts.push(ghost(14, 14, 3).spawn())
+    //otherwise only spawns the ghosts that is missing from the ghosts array
+  } else {
+    //map an array of true false to detect which ghost is missing
+    const activeNotActive = activeGhosts.map(selectedGhost => {
+      if (selectedGhost.name === ghostName) {
+        return true
+      }
+      return false
+    })
+    for (let i = 0; i < activeNotActive.length; i++) {
+      //if the activeNotActive[i] is true then ghost is active if not 
+      //then call the ghost function and push new ghost to actve ghosts
+      if (!activeGhosts[0]) activeGhosts.push(ghost(12, 13, 1).spawn())
+      if (!activeGhosts[1]) activeGhosts.push(ghost(14, 12, 2).spawn())
+      if (!activeGhosts[2]) activeGhosts.push(ghost(14, 13, 3).spawn())
+      if (!activeGhosts[3]) activeGhosts.push(ghost(14, 14, 4).spawn())
+    }
+  }
+  return false
+}
+
+
+
+//? Ghost direction changes are decided below
+
+function checkDirection(availableDirections, ghost) {
+  const cellUp = mappedGridArray[ghost.y - 1][ghost.x]
+  const cellDown = mappedGridArray[ghost.y + 1][ghost.x]
+  const cellLeft = mappedGridArray[ghost.y][ghost.x - 1]
+  const cellRight = mappedGridArray[ghost.y][ghost.x + 1]
+
+  //check if there is a path up
+  if (cellUp.classList.contains('path')
+    && availableDirections.includes('up')
+    && cellUp.querySelector('.ghost') === null) {
+    ghost.speed.x = 0
+    ghost.speed.y = -1
+    //check if there is a path on the right and then move to the rigt
+    //if a wall is found then call this function again
+  } else if (cellRight.classList.contains('path')
+    && availableDirections.includes('right')
+    && cellRight.querySelector('.ghost') === null) {
+    ghost.speed.y = 0
+    ghost.speed.x = 1
+    //check if there is a path down
+  } else if (cellDown.classList.contains('path')
+    && availableDirections.includes('down')
+    && cellDown.querySelector('.ghost') === null) {
+    ghost.speed.x = 0
+    ghost.speed.y = 1
+    //check if there is a path on the left
+  } else if (cellLeft.classList.contains('path')
+    && availableDirections.includes('left')
+    && cellLeft.querySelector('.ghost') === null) {
+    ghost.speed.y = 0
+    ghost.speed.x = -1
+  }
+}
+
+
+function availableDirections(ghost) {
+  if (ghost.speed.x === -1 || ghost.speed.x === 1) {
+    return ['up', 'down']
+  }
+  if (ghost.speed.y === -1 || ghost.speed.y === 1) {
+    return ['right', 'left']
+  }
+}
+
+function changeDirection(ghost) {
+  // check if the path ahead is not a wall
+  if (mappedGridArray[ghost.y + (ghost.speed.y)][ghost.x + (ghost.speed.x)].classList.contains('path')) {
+    //for each block that the ghost is at give me all available directions
+    const difAvailableDirections = availableDirections(ghost)
+
+    //if the available direction is more than one pick randomly between the two
+    //change direction 
+    const randomChoice = Math.floor(Math.random() * difAvailableDirections.length)
+    checkDirection([difAvailableDirections[randomChoice]], ghost)
+    ghost.move()
+  } else if (!mappedGridArray[ghost.y + (ghost.speed.y)][ghost.x + (ghost.speed.x)].classList.contains('path')) {
+    checkDirection(availableDirections(ghost), ghost)
+    ghost.move()
+  }
+}
+
+
