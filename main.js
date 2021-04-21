@@ -5,18 +5,8 @@ let gridArray = new Array()
 const displayScore = document.querySelector('#score')
 let score = 0
 let isPlaying = true
-let clyde = {}
-let blinky = {}
-let pinky = {}
-let inky = {}
-const ghostsList = {
-  clyde: [12, 13, 'clyde'],
-  blinky: [14, 12, 'blinky'],
-  pinky: [14, 13, 'pinky'],
-  inky: [14, 14, 'inky'],
-}
-
-const runSpeed = 500
+const activeGhosts = new Array()
+const runSpeed = 300
 //* MVP 
 // grey comments are guesses on how I could go about it
 
@@ -39,17 +29,20 @@ const pacman = {
 
     if (mappedGridArray[this.y][this.x].querySelector('.ghostBlink') !== null) {
       const ghostId = mappedGridArray[this.y][this.x].querySelector('.ghostBlink').getAttribute('id')
+      activeGhosts.splice(ghostId, 1)
+
       mappedGridArray[this.y][this.x].querySelector('.ghostBlink').remove()
-      // ${ ghostId } = ghost(ghostsList[ghostId[0]], ghostsList[ghostId][1], ghostsList[ghostId][2]).spawn()
+      spawnGhosts(ghostId)
+
     }
 
     //I check if pacman hit a ghost if they did then display score and stop interval 
+    //! player loses if pacman hits a ghost
     if (mappedGridArray[this.y][this.x].querySelector('.ghost') !== null) {
-      console.log('you loose')
       displayScore.innerHTML = `<em>Your loose!</em> score is: ${score}`
-      //! player loses if pacman hits a ghost
-      mappedGridArray[this.y][this.x].querySelector('pacman').remove()
-      clearInterval(myInterval)
+      for (let i = 0; i < 999; i++) {
+        clearInterval(i)
+      }
     }
   },
   eatFood() {
@@ -61,53 +54,69 @@ const pacman = {
       //display score
       displayScore.innerHTML = `Your score is: ${score}`
       //if they pick up all food then they win
-      if (document.querySelectorAll('.food').length - 10 === 0) {
+      if (document.querySelectorAll('.food').length === 0) {
         displayScore.innerHTML = `<em>Your won!</em> score is: ${score}`
-        console.log('you won')
+        for (let i = 0; i < 999; i++) {
+          clearInterval(i)
+        }
       }
     }
     if (mappedGridArray[this.y][this.x].querySelector('.bigFood') !== null) {
       mappedGridArray[this.y][this.x].querySelector('.bigFood').remove('bigFood')
       this.bigFood = true
-      // clyde.blinking()
-      // blinky.blinking()
-      // pinky.blinking()
-      // inky.blinking()
+      setTimeout(() => {
+        this.bigFood = false
+      }, 5000)
     }
   },
-  spawn() {
+  spawn(y, x) {
     const pacmanSprite = document.createElement('span')
     pacmanSprite.classList.add('pacman')
-    mappedGridArray[this.y][this.x].appendChild(pacmanSprite)
+    if (x !== undefined && y !== undefined) {
+      mappedGridArray[y][x].appendChild(pacmanSprite)
+    } else {
+      mappedGridArray[this.y][this.x].appendChild(pacmanSprite)
+    }
     pacmanChangeDirectionOnInput()
     return pacmanSprite
   },
   remove() {
     mappedGridArray[this.y][this.x].querySelector('.pacman').remove()
   },
+  teleport() {
+    if (this.y === 14 && this.x === 1) {
+      this.remove()
+      this.spawn(25, 14)
+    } else if (this.y === 25 && this.x === 14) {
+      this.remove()
+      this.spawn(1, 14)
+    }
+  },
 }
 
 
-function ghost(y, x, name) {
+function ghost(y, x, id) {
   return {
-    name: name,
     x: x,
     y: y,
     speed: { x: 1, y: 0 },
     visited: [],
     move() {
-      //remove the ghost from current position
-      mappedGridArray[this.y][this.x].querySelector('.ghost').remove()
-      //moves ghost in that direction
-      this.x += (this.speed.x)
-      this.y += (this.speed.y)
-      //add ghost on new position
-      this.spawn()
+      if (mappedGridArray[this.y][this.x].querySelector('.ghost') !== null) {
+        //remove the ghost from current position
+        this.remove()
+        //moves ghost in that direction
+        this.x += (this.speed.x)
+        this.y += (this.speed.y)
+        //add ghost on new position
+        this.spawn()
+      }
       if (pacman.bigFood) {
-        clyde.blinking()
-        blinky.blinking()
-        pinky.blinking()
-        inky.blinking()
+        activeGhosts.forEach(activeGhost => {
+          activeGhost.blinking()
+        })
+      } else {
+        this.stopBlinking()
       }
       //add position to visited
       this.visited.push(`${this.y}:${this.x}`)
@@ -115,7 +124,7 @@ function ghost(y, x, name) {
     spawn() {
       const ghostSprite = document.createElement('span')
       ghostSprite.classList.add('ghost')
-      ghostSprite.setAttribute('id', name)
+      ghostSprite.setAttribute('id', id)
       mappedGridArray[this.y][this.x].appendChild(ghostSprite)
       return this
     },
@@ -123,9 +132,17 @@ function ghost(y, x, name) {
       mappedGridArray[this.y][this.x].querySelector('.ghost').remove()
     },
     blinking() {
+      let ghost
       if (mappedGridArray[this.y][this.x].querySelector('.ghost') !== null) {
-        const ghost = mappedGridArray[this.y][this.x].querySelector('.ghost')
+        ghost = mappedGridArray[this.y][this.x].querySelector('.ghost')
         ghost.classList.add('ghostBlink')
+      }
+    },
+    stopBlinking() {
+      let ghost
+      if (mappedGridArray[this.y][this.x].querySelector('.ghost') !== null) {
+        ghost = mappedGridArray[this.y][this.x].querySelector('.ghost')
+        ghost.classList.remove('ghostBlink')
       }
     },
   }
@@ -150,11 +167,9 @@ map1Exclude.forEach(number => {
   gridArray[number - 1].classList.add('empty')
 })
 
-//mappedGridArray.forEach()
 
 
 // ? Code to create a static board
-
 //? Basically a map builder
 // let staticGrid = []
 
@@ -189,6 +204,12 @@ mappedGridArray.forEach(row => {
   })
 })
 
+//? set up teleport tunnel so ghosts cannot enter it and only pacman can
+mappedGridArray[14][20].classList.remove('path')
+mappedGridArray[14][6].classList.remove('path')
+mappedGridArray[14][20].classList.add('tunnel')
+mappedGridArray[14][6].classList.add('tunnel')
+
 const bigFoodCord = [[5, 2], [5, 24], [22, 2], [23, 10]]
 
 bigFoodCord.forEach(bigFood => {
@@ -204,30 +225,54 @@ bigFoodCord.forEach(bigFood => {
 //? spawn pacman in predifined location without any movement
 //span pacman under the ghost spawn box 
 pacman.spawn()
+pacman.teleport()
 
 
 //? spawn 4 ghosts in spawn box
 //spawn 4 ghosts in the ghost box and make them exit with a delay of 2 seconds
 // each. i.e. second won't leave until first is gone for 2 seconds
-clyde = ghost(ghostsList.clyde[0], ghostsList.clyde[1], ghostsList.clyde[2]).spawn()
-blinky = ghost(ghostsList.blinky[0], ghostsList.blinky[1], ghostsList.blinky[2]).spawn()
-pinky = ghost(ghostsList.pinky[0], ghostsList.pinky[1], ghostsList.pinky[2]).spawn()
-inky = ghost(ghostsList.inky[0], ghostsList.inky[1], ghostsList.inky[2]).spawn()
+function spawnGhosts(ghostName) {
+  if (ghostName === undefined) {
+    activeGhosts.push(ghost(12, 13, 0).spawn())
+    activeGhosts.push(ghost(14, 12, 1).spawn())
+    activeGhosts.push(ghost(14, 13, 2).spawn())
+    activeGhosts.push(ghost(14, 14, 3).spawn())
+    console.log(activeGhosts)
+  } else {
+    const activeNotActive = activeGhosts.map(selectedGhost => {
+      if (selectedGhost.name === ghostName) {
+        return true
+      }
+      return false
+    })
+    for (let i = 0; i < activeNotActive.length; i++) {
+      if (!activeGhosts[0]) {
+        activeGhosts.push(ghost(12, 13, 1).spawn())
+      } else if (!activeGhosts[1]) {
+        activeGhosts.push(ghost(14, 12, 2).spawn())
+      } else if (!activeGhosts[2]) {
+        activeGhosts.push(ghost(14, 13, 3).spawn())
+      } else if (!activeGhosts[3]) {
+        activeGhosts.push(ghost(14, 14, 4).spawn())
+      }
+    }
+  }
+  return false
+}
+
+spawnGhosts()
 
 const myInterval = setInterval(() => {
   //! pacman stops moving if it hits a wall while moving in a 
   //! given direction until player turns pacman
   pacman.move()
   pacman.eatFood()
-
   //? have ghosts move towards random directions in the grid
   // make ghosts move in a given direction until they have to turn if there are 2 or more 
   // choices at an intersection choose randomly
-  changeDirection(clyde)
-  changeDirection(blinky)
-  changeDirection(pinky)
-  changeDirection(inky)
-
+  activeGhosts.forEach(activeGhost => {
+    changeDirection(activeGhost)
+  })
 }, runSpeed)
 
 
@@ -240,26 +285,26 @@ function checkDirection(availableDirections, ghost) {
   const cellRight = mappedGridArray[ghost.y][ghost.x + 1]
 
   //check if there is a path up
-  if (!cellUp.classList.contains('wall')
+  if (cellUp.classList.contains('path')
     && availableDirections.includes('up')
     && cellUp.querySelector('.ghost') === null) {
     ghost.speed.x = 0
     ghost.speed.y = -1
     //check if there is a path on the right and then move to the rigt
     //if a wall is found then call this function again
-  } else if (!cellRight.classList.contains('wall')
+  } else if (cellRight.classList.contains('path')
     && availableDirections.includes('right')
     && cellRight.querySelector('.ghost') === null) {
     ghost.speed.y = 0
     ghost.speed.x = 1
     //check if there is a path down
-  } else if (!cellDown.classList.contains('wall')
+  } else if (cellDown.classList.contains('path')
     && availableDirections.includes('down')
     && cellDown.querySelector('.ghost') === null) {
     ghost.speed.x = 0
     ghost.speed.y = 1
     //check if there is a path on the left
-  } else if (!cellLeft.classList.contains('wall')
+  } else if (cellLeft.classList.contains('path')
     && availableDirections.includes('left')
     && cellLeft.querySelector('.ghost') === null) {
     ghost.speed.y = 0
@@ -269,21 +314,12 @@ function checkDirection(availableDirections, ghost) {
 
 
 function availableDirections(ghost) {
-  const array = new Array()
-  if (ghost.speed.x !== -1) {
-    array.push('left')
+  if (ghost.speed.x === -1 || ghost.speed.x === 1) {
+    return ['up', 'down']
   }
-  if (ghost.speed.x !== 1) {
-    array.push('right')
+  if (ghost.speed.y === -1 || ghost.speed.y === 1) {
+    return ['right', 'left']
   }
-  if (ghost.speed.y !== -1) {
-    array.push('up')
-  }
-  if (ghost.speed.y !== 1) {
-    array.push('down')
-  }
-
-  return array
 }
 
 function changeDirection(ghost) {
