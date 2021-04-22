@@ -9,14 +9,34 @@
   <link rel="stylesheet" href="style.css">
   <script defer src="./functions.js"></script>
   <script defer src="./data.js"></script>
+  <script defer src="./smartGhost.js"></script>
   <script defer src="./main.js"></script>
+
 </head>
 
 <body>
-  <h3 id="score">Your Score is: <span id="scoreNum"></span></h3>
-  <div id="game-window">
+  <main style="display: none;">
+    <header>
+      <h3>Your Score is: <span id="score"></span></h3>
+      <h3 id="highestScore">Highest Score</h3>
+    </header>
 
-  </div>
+    <div id="game-window">
+
+    </div>
+  </main>
+  <section id="main-menu">
+    <div>
+      <h1>Pacman</h1>
+      <div id="controls">
+        <button id="play">Play</button>
+        <button id="settings">Settings</button>
+      </div>
+    </div>
+  </section>
+  <section id="results" style="display: none;">
+    <h2 id="result"></h2>
+  </section>
   <!-- <button id="logmap">Log</button> -->
 </body>
 

@@ -1,9 +1,22 @@
+@font-face {
+  font-family: 'Arcade Classic';
+  src: url('./fonts/ARCADECLASSIC.TTF');
+}
+
 * {
   box-sizing: border-box;
 }
 
+:root {
+  --width: 800px;
+  --height: 800px;
+  --rotateVal: 0deg;
+}
+
 body {
   height: 100vh;
+  font-family: 'Arcade Classic', Times, serif;
+  letter-spacing: 2px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -11,12 +24,20 @@ body {
   margin: 0;
 }
 
+header {
+  display: flex;
+  width: var(--width);
+  justify-content: space-around;
+}
+
+
+
 #game-window {
   display: flex;
   flex-flow: row wrap;
   border: 2px solid yellow;
-  height: 800px;
-  width: 800px;
+  height: var(--height);
+  width: var(--width);
   background-color: black;
 }
 
@@ -25,6 +46,52 @@ body {
   align-items: center;
   justify-content: center;
   color: white;
+}
+
+section {
+  width: var(--width);
+  height: var(--width);
+  background-color: black;
+  color: white;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+#controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#results {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
+h1 {
+  text-align: center;
+  font-size: 4em;
+
+}
+
+button {
+  font-family: 'Arcade Classic';
+  font-size: 1.4em;
+  padding: 20px;
+  border: 2px white solid;
+  background-color: transparent;
+  color: white;
+  margin: 10px;
+}
+
+#play:hover {
+  cursor: pointer;
+  background-color: white;
+  color: black;
+  border: 2px black solid;
 }
 
 .wall {
@@ -58,48 +125,67 @@ body {
 }
 
 .pacman {
-  height: 25px;
   width: 25px;
-  margin: 0 auto;
-  background-color: yellow;
+  height: 25px;
   border-radius: 50%;
-  display: inline-block;
+  background: #f2d648;
   position: absolute;
+  transform: rotate(var(--rotateVal));
 }
 
+/* .rotateUp {
+  transform: rotate(-90deg);
+}
+
+.rotateDown {
+  transform: rotate(90deg);
+}
+
+.rotateLeft {
+  transform: rotate(180deg);
+}
+
+.rotateRight {
+  transform: rotate(-180deg);
+} */
+
+.pacman_mouth {
+  background: #000;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  clip-path: polygon(100% 74%, 44% 48%, 100% 21%);
+}
 
 
 .ghost {
   height: 25px;
   width: 25px;
-  margin: 0 auto;
-  background-color: teal;
-  border-radius: 25%;
   display: inline-block;
   position: absolute;
 }
 
-@keyframes switchColor {
+@keyframes hideAndShow {
   0% {
-    background-color: white;
+    opacity: 1;
   }
 
   50% {
-    background-color: blue;
+    opacity: 0.75;
   }
 
   75% {
-    background-color: white;
+    opacity: 0.5;
   }
 
   100% {
-    background-color: blue;
+    opacity: 0.25;
   }
 }
 
 .ghostBlink {
   background-color: white;
-  animation-name: switchColor;
+  animation-name: hideAndShow;
   animation-duration: 1s;
   animation-iteration-count: infinite;
 }
