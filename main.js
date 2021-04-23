@@ -4,25 +4,98 @@ const elements = {
   grid: document.querySelector('#game-window'),
   displayScore: document.querySelector('#score'),
   mainMenu: document.querySelector('#main-menu'),
-  playBtn: document.querySelector('#play'),
+  playBtn: document.querySelectorAll('.playBtn'),
+  settingsBtn: document.querySelector('#settingsBtn'),
   mainWindow: document.querySelector('main'),
   resultWindow: document.querySelector('#results'),
   displayResult: document.querySelector('#result'),
+  settingsWindow: document.querySelector('#settings'),
+  sfx: document.querySelector('#SFX'),
+  music: document.querySelector('#MUSIC'),
+  FPS: document.querySelector('#framerate'),
 }
 
 const gridArray = new Array()
 const WIDTH = 25
 const HEIGHT = (WIDTH + 3)
-// refer to ./functions.js file
-const mappedGridArray = createMap(HEIGHT, WIDTH)
-
+let SFX = true
+let MUSIC = true
+let mappedGridArray
 let score = 0
 let isPlaying = true
-const activeGhosts = new Array()
-const runSpeed = 500
-let totalFood = document.querySelectorAll('.food').length
+let activeGhosts = {
+  add(ghostName) {
+    if (this[ghostName] === undefined) {
+      this[ghostName] = ghost(GHOSTS_PRESET[ghostName].x, GHOSTS_PRESET[ghostName].y, ghostName)
+      return this[ghostName]
+    }
+  },
+}
+let frameIndex = 0
+const FRAMEOPTIONS = [10, 20, 30, 40]
+let FRAMERATE = FRAMEOPTIONS[frameIndex]
 
-elements.playBtn.addEventListener('click', playGame)
+const GHOSTS_PRESET = {
+  inky: {
+    y: 13,
+    x: 12,
+  },
+  blinky: {
+    y: 12,
+    x: 14,
+  },
+  clyde: {
+    y: 13,
+    x: 14,
+  },
+  pinky: {
+    y: 14,
+    x: 14,
+  },
+}
+
+
+
+//listen for game start button and call playGame if it is clicked
+elements.playBtn.forEach(button => {
+  button.addEventListener('click', playGame)
+})
+//listen for settings button and show settings window on click
+elements.settingsBtn.addEventListener('click', () => {
+  elements.mainMenu.style.display = 'none'
+  elements.settingsWindow.style.display = 'flex'
+})
+//listen to settings and change accordingly
+elements.settingsWindow.addEventListener('click', (e) => {
+  console.log(e.target.lastChild)
+  if (e.target.localName === 'button' || e.target.localName === 'span') {
+    if (e.target.lastChild.id === 'SFX' || e.target.id === 'SFX') {
+      SFX = !SFX
+      elements.sfx.innerHTML = SFX
+    }
+    if (e.target.lastChild.id === 'MUSIC' || e.target.id === 'MUSIC') {
+      MUSIC = !MUSIC
+      elements.music.innerHTML = MUSIC
+    }
+    if (e.target.id === 'exit') {
+      elements.mainMenu.style.display = 'flex'
+      elements.settingsWindow.style.display = 'none'
+    }
+    if (e.target.id === 'framerate' || e.target.lastChild.id === 'framerate') {
+      elements.FPS.innerHTML = FRAMEOPTIONS[frameIndex]
+      FRAMERATE = FRAMEOPTIONS[frameIndex]
+      frameIndex++
+    }
+    if (frameIndex >= FRAMEOPTIONS.length) frameIndex = 0
+  }
+})
+
+// set music/sfx value to true or false
+// set frame rate
+elements.sfx.innerHTML = SFX
+elements.music.innerHTML = MUSIC
+elements.FPS.innerHTML = FRAMEOPTIONS[frameIndex]
+
 
 const pacman = {
   //here x and y are the current coordinates
@@ -43,33 +116,41 @@ const pacman = {
   //then places player there
   move() {
     if (this.target() === undefined) return
-
     if (!this.target().classList.contains('wall')) {
       this.remove()
       this.x += (this.speed.x)
       this.y += (this.speed.y)
       this.spawn()
     }
+
+
     //https://briangrinstead.com/blog/astar-search-algorithm-in-javascript/
 
     if (this.current().querySelector('.ghostBlink') !== null
       && this.current().querySelector('.pacman') !== null) {
+      if (SFX) playSound('pacman_death')
       const ghostId = this.current().querySelector('.ghostBlink').getAttribute('id')
-      activeGhosts.splice(ghostId, 1)
+      delete activeGhosts[ghostId]
       score += 200
       this.current().querySelector('.ghostBlink').remove()
-      spawnGhosts(ghostId)
+      setTimeout(() => {
+        if (!activeGhosts[ghostId]) {
+          activeGhosts.add(ghostId).spawn()
+        }
+      }, 1000)
+
     }
 
 
     //! player loses if pacman hits a ghost
     if (this.current().querySelector('.ghost') !== null
       && this.current().querySelector('.pacman')) {
+      if (SFX) playSound('pacman_death')
       //set the mainWindow to display none and set the result window to display flex
       elements.mainWindow.style.display = 'none'
       elements.resultWindow.style.display = 'flex'
       //? If player looses stop game loop and display result
-      elements.displayResult.innerHTML = `<em>Your loose!</em> score is: ${score}`
+      elements.displayResult.innerHTML = `Your loose! score is: ${score}`
       for (let i = 1; i < 999; i++) {
         clearInterval(i)
       }
@@ -78,25 +159,27 @@ const pacman = {
   eatFood() {
     //! pacman eats the food as it moves trough the maze
     if (this.current().querySelector('.food') !== null) {
+      if (SFX) playSound('pacman_chomp.wav')
       this.current().querySelector('.food').remove('food')
       //increase score after eating food
       score += 10
-      totalFood--
       //display score
       elements.displayScore.innerHTML = score
       //if they pick up all food then they win
       //! player wins if pacman eats all the food in the level
-      if (totalFood === 0) {
+      if (document.querySelectorAll('.food').length === 0
+        && document.querySelectorAll('.bigFood').length === 0) {
         elements.mainWindow.style.display = 'none'
         elements.resultWindow.style.display = 'flex'
         //? if player wins display score (for mvp only one level)
-        elements.displayResult.innerHTML = `<em>Your won!</em> score is:   ${score}`
+        elements.displayResult.innerHTML = `You win! score is:   ${score}`
         for (let i = 1; i < 999; i++) {
           clearInterval(i)
         }
       }
     }
     if (this.current().querySelector('.bigFood') !== null) {
+      score += 50
       this.current().querySelector('.bigFood').remove('bigFood')
       this.bigFood = true
       setTimeout(() => {
@@ -139,11 +222,11 @@ const pacman = {
 }
 
 
-function ghost(y, x, id, name) {
+function ghost(y, x, name) {
   return {
     x: x,
     y: y,
-    speed: { x: 1, y: 0 },
+    speed: { x: 0, y: -1 },
     visited: [],
     //current element where ghost is 
     current() {
@@ -154,6 +237,7 @@ function ghost(y, x, id, name) {
       return mappedGridArray[this.y + (this.speed.y)][this.x + (this.speed.x)]
     },
     move() {
+      changeDirection(this)
       if (mappedGridArray[this.y][this.x].querySelector('.ghost') !== null) {
         //remove the ghost from current position
         this.remove()
@@ -164,9 +248,10 @@ function ghost(y, x, id, name) {
         this.spawn()
       }
       if (pacman.bigFood) {
-        activeGhosts.forEach(activeGhost => {
-          activeGhost.blinking()
-        })
+        const array = Object.entries(activeGhosts)
+        for (let i = 1; i < array.length; i++) {
+          array[i][1].blinking()
+        }
       } else {
         this.stopBlinking()
       }
@@ -176,7 +261,7 @@ function ghost(y, x, id, name) {
     spawn(y, x) {
       const ghostSprite = document.createElement('span')
       ghostSprite.classList.add('ghost')
-      ghostSprite.setAttribute('id', id)
+      ghostSprite.setAttribute('id', name)
       ghostSprite.style.background = `url(./assets/${name}.svg)`
       if (y !== undefined && x !== undefined) {
         this.y = y
@@ -219,13 +304,20 @@ function ghost(y, x, id, name) {
   }
 }
 
+function playSound(url) {
+  let audio = document.createElement('audio')
+  audio.src = `./assets/${url}`
+  audio.play()
+}
+
 
 function setup() {
+  // refer to ./functions.js file
+  mappedGridArray = createMap(HEIGHT, WIDTH)
   //? add blueprint onto grid, for MVP it will be a static board
   // from the map1 array gives the class wall to all walls
   map1.forEach((coordinate) => {
     mappedGridArray[coordinate[0]][coordinate[1]].classList.add('wall')
-    mappedGridArray[coordinate[0]][coordinate[1]].weight = 0
     mappedGridArray[coordinate[0]][coordinate[1]].type = 'wall'
   })
   // gives the class empty to all other boxes outside player path that are not walls
@@ -267,6 +359,20 @@ function setup() {
   //? set up teleport tunnels
   mappedGridArray[14][1].classList.add('portalLeft')
   mappedGridArray[14][25].classList.add('portalRight')
+  //?take food away from holding pen
+  mappedGridArray[13][13].children[0].classList.remove('food')
+  mappedGridArray[14][12].children[0].classList.remove('food')
+  mappedGridArray[15][12].children[0].classList.remove('food')
+  mappedGridArray[14][13].children[0].classList.remove('food')
+  mappedGridArray[15][13].children[0].classList.remove('food')
+  mappedGridArray[14][14].children[0].classList.remove('food')
+  mappedGridArray[15][14].children[0].classList.remove('food')
+  mappedGridArray[23][13].children[0].classList.remove('food')
+
+
+  //? play sound 
+  if (MUSIC) playSound('pacman_beginning.wav')
+
 
   //? spawn pacman in predifined location without any movement
   //span pacman under the ghost spawn box 
@@ -274,7 +380,28 @@ function setup() {
   pacmanChangeDirectionOnInput()
 
   //? spawn 4 ghosts in spawn box
-  spawnGhosts()
+  activeGhosts.add('inky').spawn()
+  activeGhosts.add('blinky').spawn()
+  activeGhosts.add('clyde').spawn()
+  activeGhosts.add('pinky').spawn()
+
+}
+
+function reset() {
+  gridArray.forEach(elt => {
+    elt.remove()
+  })
+  score = 0
+  activeGhosts = {
+    add(ghostName) {
+      if (this[ghostName] === undefined) {
+        this[ghostName] = ghost(GHOSTS_PRESET[ghostName].x, GHOSTS_PRESET[ghostName].y, ghostName)
+        return this[ghostName]
+      }
+    },
+  }
+  pacman.x = 13
+  pacman.y = 23
 }
 
 
@@ -301,13 +428,17 @@ function setup() {
 
 
 
-
 function playGame() {
+  const RUNSPEED = (10000 / FRAMERATE)
   isPlaying = true
   if (!isPlaying) return
+  reset()
   setup()
   elements.mainMenu.style.display = 'none'
+  elements.resultWindow.style.display = 'none'
   elements.mainWindow.style.display = 'block'
+
+
   // ? start the game - loop 
   const myInterval = setInterval(() => {
     //? Teleport pacman
@@ -322,28 +453,32 @@ function playGame() {
     //! given direction until player turns pacman
     //start pacman move and eatFood methods
     pacman.eatFood()
-  }, runSpeed - 200)
+  }, RUNSPEED - 200)
 
 
   const myInterval1 = setInterval(() => {
     //? have ghosts move towards random directions in the grid
     // make ghosts move in a given direction until they have to turn if there are 2 or more 
     // choices at an intersection choose randomly
-    activeGhosts.forEach(activeGhost => {
-      changeDirection(activeGhost)
-    })
-  }, runSpeed)
+    const array = Object.entries(activeGhosts)
+    for (let i = 1; i < array.length; i++) {
+      array[i][1].move()
+    }
+
+  }, RUNSPEED)
 
 }
 
 
 
-astar.search(mappedGridArray, mappedGridArray[pacman.y][pacman.x], mappedGridArray[23][23])
+
 
 
 //* enhancements
 
 //? Smart Ghosts
+
+
 //? will choose one according to time left
 // 1 Make ghosts move towards the general direction of the player
 // 2 Make ghosts draw a path to the player path can overlap 

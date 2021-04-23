@@ -51,7 +51,13 @@ function pacmanChangeDirectionOnInput() {
   document.addEventListener('keydown', (e) => {
     //get keypressed
     const key = e.key
-
+    if (key === 'Escape') {
+      elements.mainWindow.style.display = 'none'
+      elements.mainMenu.style.display = 'flex'
+      for (let i = 1; i < 999; i++) {
+        clearInterval(i)
+      }
+    }
     let up, down, left, right
 
     up = mappedGridArray[pacman.y - 1][pacman.x]
@@ -94,39 +100,6 @@ function pacmanChangeDirectionOnInput() {
   })
 
 }
-
-
-
-//? Spawn all ghosts function
-function spawnGhosts(ghostName) {
-  //checks if no argument was given, if that is the case spawns all ghosts
-  if (ghostName === undefined) {
-    activeGhosts.push(ghost(12, 13, 0, 'inky').spawn())
-    activeGhosts.push(ghost(14, 12, 1, 'blinky').spawn())
-    activeGhosts.push(ghost(14, 13, 2, 'clyde').spawn())
-    activeGhosts.push(ghost(14, 14, 3, 'pinky').spawn())
-    //otherwise only spawns the ghosts that is missing from the ghosts array
-  } else {
-    //map an array of true false to detect which ghost is missing
-    const activeNotActive = activeGhosts.map(selectedGhost => {
-      if (selectedGhost.name === ghostName) {
-        return true
-      }
-      return false
-    })
-    for (let i = 0; i < activeNotActive.length; i++) {
-      //if the activeNotActive[i] is true then ghost is active if not 
-      //then call the ghost function and push new ghost to actve ghosts
-      if (!activeGhosts[0]) activeGhosts.push(ghost(12, 13, 1, 'inky').spawn())
-      if (!activeGhosts[1]) activeGhosts.push(ghost(14, 12, 2, 'blinky').spawn())
-      if (!activeGhosts[2]) activeGhosts.push(ghost(14, 13, 3, 'clyde').spawn())
-      if (!activeGhosts[3]) activeGhosts.push(ghost(14, 14, 4, 'pinky').spawn())
-    }
-  }
-  return false
-}
-
-
 
 //? Ghost direction changes are decided below
 
@@ -182,17 +155,14 @@ function changeDirection(ghost) {
   }
   if (ghost.target().classList.contains('path')) {
     //for each block that the ghost is at give me all available directions
-    const difAvailableDirections = availableDirections(ghost)
-
     //if the available direction is more than one pick randomly between the two
-    //change direction 
+    //change direction
+    const difAvailableDirections = availableDirections(ghost)
     const randomChoice = Math.floor(Math.random() * difAvailableDirections.length)
     checkDirection([difAvailableDirections[randomChoice]], ghost)
-    ghost.move()
-    console.log(ghost.target().type === 'wall')
+    // let array = astar.search(mappedGridArray, ghost.current(), pacman.current())
   } else if (ghost.target().type === 'wall') {
     checkDirection(availableDirections(ghost), ghost)
-    ghost.move()
   }
 }
 

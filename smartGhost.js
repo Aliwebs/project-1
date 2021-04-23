@@ -39,7 +39,6 @@ const astar = {
 
       for (let i = 0; i < neighbors.length; i++) {
         const neighbor = neighbors[i]
-        console.log(neighbor.type)
         if (closedList.indexOf(neighbor) !== -1 || neighbor.type === 'wall') {
           // not a valid node to process, skip to next neighbor
           continue
@@ -88,20 +87,20 @@ const astar = {
     const x = node.pos.x
     const y = node.pos.y
 
-    if (x > 0 && y > 0) {
-      if (grid[y][x - 1]) {
-        ret.push(grid[y][x - 1])
-      }
-      if (grid[y][x + 1]) {
-        ret.push(grid[y][x + 1])
-      }
-      if (grid[y - 1][x]) {
-        ret.push(grid[y - 1][x])
-      }
-      if (grid[y + 1][x]) {
-        ret.push(grid[y + 1][x])
-      }
+    // if (x > 0 && y > 0) {
+    if (grid[y][x - 1]) {
+      ret.push(grid[y][x - 1])
     }
+    if (grid[y][x + 1]) {
+      ret.push(grid[y][x + 1])
+    }
+    if (grid[y - 1][x]) {
+      ret.push(grid[y - 1][x])
+    }
+    if (grid[y + 1][x]) {
+      ret.push(grid[y + 1][x])
+    }
+    // }
     return ret
   },
 }

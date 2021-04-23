@@ -22,6 +22,7 @@ body {
   align-items: center;
   flex-direction: column;
   margin: 0;
+  text-align: center;
 }
 
 header {
@@ -67,14 +68,20 @@ section {
 
 #results {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-content: center;
 }
 
-h1 {
-  text-align: center;
-  font-size: 4em;
+#settings {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 
+h1 {
+  font-size: 4em;
 }
 
 button {
@@ -85,9 +92,10 @@ button {
   background-color: transparent;
   color: white;
   margin: 10px;
+  width: 100%;
 }
 
-#play:hover {
+button:hover {
   cursor: pointer;
   background-color: white;
   color: black;
@@ -133,22 +141,6 @@ button {
   transform: rotate(var(--rotateVal));
 }
 
-/* .rotateUp {
-  transform: rotate(-90deg);
-}
-
-.rotateDown {
-  transform: rotate(90deg);
-}
-
-.rotateLeft {
-  transform: rotate(180deg);
-}
-
-.rotateRight {
-  transform: rotate(-180deg);
-} */
-
 .pacman_mouth {
   background: #000;
   position: absolute;
@@ -167,25 +159,25 @@ button {
 
 @keyframes hideAndShow {
   0% {
-    opacity: 1;
+    background-color: white;
   }
 
   50% {
-    opacity: 0.75;
+    background-color: black;
   }
 
   75% {
-    opacity: 0.5;
+    background-color: white;
   }
 
   100% {
-    opacity: 0.25;
+    background-color: black;
   }
 }
 
 .ghostBlink {
-  background-color: white;
   animation-name: hideAndShow;
-  animation-duration: 1s;
+  animation-duration: 2s;
   animation-iteration-count: infinite;
+  border-radius: 25%;
 }
