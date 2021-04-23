@@ -53,6 +53,7 @@ function pacmanChangeDirectionOnInput() {
     const key = e.key
     if (key === 'Escape') {
       elements.mainWindow.style.display = 'none'
+      elements.resultWindow.style.display = 'none'
       elements.mainMenu.style.display = 'flex'
       for (let i = 1; i < 999; i++) {
         clearInterval(i)
@@ -144,6 +145,7 @@ function availableDirections(ghost) {
   if (ghost.speed.y === -1 || ghost.speed.y === 1) {
     return ['right', 'left']
   }
+  return ['up', 'down', 'left', 'right']
 }
 
 function changeDirection(ghost) {
@@ -160,10 +162,12 @@ function changeDirection(ghost) {
     const difAvailableDirections = availableDirections(ghost)
     const randomChoice = Math.floor(Math.random() * difAvailableDirections.length)
     checkDirection([difAvailableDirections[randomChoice]], ghost)
-    // let array = astar.search(mappedGridArray, ghost.current(), pacman.current())
   } else if (ghost.target().type === 'wall') {
     checkDirection(availableDirections(ghost), ghost)
   }
 }
+
+
+//? Smart ghosts
 
 

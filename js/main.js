@@ -3,6 +3,7 @@
 const elements = {
   grid: document.querySelector('#game-window'),
   displayScore: document.querySelector('#score'),
+  high: document.querySelector('#highestScore'),
   mainMenu: document.querySelector('#main-menu'),
   playBtn: document.querySelectorAll('.playBtn'),
   settingsBtn: document.querySelector('#settingsBtn'),
@@ -10,9 +11,12 @@ const elements = {
   resultWindow: document.querySelector('#results'),
   displayResult: document.querySelector('#result'),
   settingsWindow: document.querySelector('#settings'),
+  instructionsWindow: document.querySelector('#instructions'),
   sfx: document.querySelector('#SFX'),
   music: document.querySelector('#MUSIC'),
   FPS: document.querySelector('#framerate'),
+  instructionBtn: document.querySelector('#instructionBtn'),
+
 }
 
 const gridArray = new Array()
@@ -32,17 +36,17 @@ let activeGhosts = {
   },
 }
 let frameIndex = 0
-const FRAMEOPTIONS = [10, 20, 30, 40]
+const FRAMEOPTIONS = [20, 30, 40]
 let FRAMERATE = FRAMEOPTIONS[frameIndex]
 
 const GHOSTS_PRESET = {
   inky: {
-    y: 13,
-    x: 12,
-  },
-  blinky: {
     y: 12,
     x: 14,
+  },
+  blinky: {
+    y: 13,
+    x: 19,
   },
   clyde: {
     y: 13,
@@ -56,47 +60,64 @@ const GHOSTS_PRESET = {
 
 
 
-//listen for game start button and call playGame if it is clicked
-elements.playBtn.forEach(button => {
-  button.addEventListener('click', playGame)
-})
-//listen for settings button and show settings window on click
-elements.settingsBtn.addEventListener('click', () => {
-  elements.mainMenu.style.display = 'none'
-  elements.settingsWindow.style.display = 'flex'
-})
-//listen to settings and change accordingly
-elements.settingsWindow.addEventListener('click', (e) => {
-  console.log(e.target.lastChild)
-  if (e.target.localName === 'button' || e.target.localName === 'span') {
-    if (e.target.lastChild.id === 'SFX' || e.target.id === 'SFX') {
-      SFX = !SFX
-      elements.sfx.innerHTML = SFX
+function preSetup() {
+  //listen for game start button and call playGame if it is clicked
+  elements.playBtn.forEach(button => {
+    button.addEventListener('click', playGame)
+  })
+  //listen for settings button and show settings window on click
+  elements.settingsBtn.addEventListener('click', () => {
+    elements.mainMenu.style.display = 'none'
+    elements.settingsWindow.style.display = 'flex'
+  })
+  //listen to settings and change accordingly
+  elements.settingsWindow.addEventListener('click', (e) => {
+    console.log(e.target.lastChild)
+    if (e.target.localName === 'button' || e.target.localName === 'span') {
+      if (e.target.lastChild.id === 'SFX' || e.target.id === 'SFX') {
+        SFX = !SFX
+        elements.sfx.innerHTML = SFX
+      }
+      if (e.target.lastChild.id === 'MUSIC' || e.target.id === 'MUSIC') {
+        MUSIC = !MUSIC
+        elements.music.innerHTML = MUSIC
+      }
+      if (e.target.classList.contains('exit')) {
+        elements.mainMenu.style.display = 'flex'
+        elements.settingsWindow.style.display = 'none'
+      }
+      if (e.target.id === 'framerate' || e.target.lastChild.id === 'framerate') {
+        elements.FPS.innerHTML = FRAMEOPTIONS[frameIndex]
+        FRAMERATE = FRAMEOPTIONS[frameIndex]
+        frameIndex++
+      }
+      if (frameIndex >= FRAMEOPTIONS.length) frameIndex = 0
     }
-    if (e.target.lastChild.id === 'MUSIC' || e.target.id === 'MUSIC') {
-      MUSIC = !MUSIC
-      elements.music.innerHTML = MUSIC
-    }
-    if (e.target.id === 'exit') {
-      elements.mainMenu.style.display = 'flex'
-      elements.settingsWindow.style.display = 'none'
-    }
-    if (e.target.id === 'framerate' || e.target.lastChild.id === 'framerate') {
-      elements.FPS.innerHTML = FRAMEOPTIONS[frameIndex]
-      FRAMERATE = FRAMEOPTIONS[frameIndex]
-      frameIndex++
-    }
-    if (frameIndex >= FRAMEOPTIONS.length) frameIndex = 0
-  }
-})
+  })
 
-// set music/sfx value to true or false
-// set frame rate
-elements.sfx.innerHTML = SFX
-elements.music.innerHTML = MUSIC
-elements.FPS.innerHTML = FRAMEOPTIONS[frameIndex]
+  elements.instructionBtn.addEventListener('click', () => {
+    elements.mainMenu.style.display = 'none'
+    elements.instructionsWindow.style.display = 'flex'
+  })
 
+  elements.instructionsWindow.addEventListener('click', (e) => {
+    console.log(e.target)
+    if (e.target.localName === 'button' || e.target.localName === 'span') {
+      if (e.target.classList.contains('exit')) {
+        elements.mainMenu.style.display = 'flex'
+        elements.instructionsWindow.style.display = 'none'
+      }
+    }
+  })
 
+  // set music/sfx value to true or false
+  // set frame rate
+  elements.sfx.innerHTML = SFX
+  elements.music.innerHTML = MUSIC
+  elements.FPS.innerHTML = FRAMEOPTIONS[frameIndex]
+
+}
+preSetup()
 const pacman = {
   //here x and y are the current coordinates
   x: 13,
@@ -162,9 +183,17 @@ const pacman = {
       if (SFX) playSound('pacman_chomp.wav')
       this.current().querySelector('.food').remove('food')
       //increase score after eating food
-      score += 10
+      if (this.bigFood) {
+        score += 20
+      } else {
+        score += 10
+      }
+      if (localStorage.getItem('highScore') < score) {
+        localStorage.setItem('highScore', score)
+      }
       //display score
       elements.displayScore.innerHTML = score
+      elements.high.innerHTML = localStorage.getItem('highScore')
       //if they pick up all food then they win
       //! player wins if pacman eats all the food in the level
       if (document.querySelectorAll('.food').length === 0
@@ -226,7 +255,7 @@ function ghost(y, x, name) {
   return {
     x: x,
     y: y,
-    speed: { x: 0, y: -1 },
+    speed: { x: 0, y: 0 },
     visited: [],
     //current element where ghost is 
     current() {
@@ -236,15 +265,22 @@ function ghost(y, x, name) {
     target() {
       return mappedGridArray[this.y + (this.speed.y)][this.x + (this.speed.x)]
     },
-    move() {
-      changeDirection(this)
-      if (mappedGridArray[this.y][this.x].querySelector('.ghost') !== null) {
-        //remove the ghost from current position
+    move(movementLogic) {
+      if (typeof movementLogic === 'function') {
+        movementLogic(this)
+        if (mappedGridArray[this.y][this.x].querySelector('.ghost') !== null) {
+          //remove the ghost from current position
+          this.remove()
+          //moves ghost in that direction
+          this.x += (this.speed.x)
+          this.y += (this.speed.y)
+          //add ghost on new position
+          this.spawn()
+        }
+      } else if (movementLogic !== undefined) {
         this.remove()
-        //moves ghost in that direction
-        this.x += (this.speed.x)
-        this.y += (this.speed.y)
-        //add ghost on new position
+        this.x = movementLogic.pos.x
+        this.y = movementLogic.pos.y
         this.spawn()
       }
       if (pacman.bigFood) {
@@ -321,18 +357,32 @@ function setup() {
     mappedGridArray[coordinate[0]][coordinate[1]].type = 'wall'
   })
   // gives the class empty to all other boxes outside player path that are not walls
-  map1Exclude.forEach(number => {
-    gridArray[number - 1].classList.add('empty')
+  map1Exclude.forEach((coordinate) => {
+    mappedGridArray[coordinate[0]][coordinate[1]].classList.add('empty')
+    mappedGridArray[coordinate[0]][coordinate[1]].type = 'empty'
   })
 
-  // const allWalls = mappedGridArray.map(column => {
-  //   return column.filter((cell, index) => {
-  //     if (cell.classList.contains('wall')
-  //       && cell[index + 1].classList.contains('wall')) {
 
-  //     }
-  //   })
-  // })
+  for (let i = 0; i < gridArray.length; i++) {
+    if (gridArray[i].classList.contains('wall')) {
+      if (gridArray[i + 1] !== undefined
+        && gridArray[i + 1].classList.contains('wall')) {
+        gridArray[i].style.borderRight = 'none'
+      }
+      if (gridArray[i - 1] !== undefined
+        && gridArray[i - 1].classList.contains('wall')) {
+        gridArray[i].style.borderLeft = 'none'
+      }
+      if (gridArray[i - WIDTH] !== undefined
+        && gridArray[i - WIDTH].classList.contains('wall')) {
+        gridArray[i].style.borderTop = 'none'
+      }
+      if (gridArray[i + WIDTH] !== undefined
+        && gridArray[i + WIDTH].classList.contains('wall')) {
+        gridArray[i].style.borderBottom = 'none'
+      }
+    }
+  }
 
   //? place the food that pacman needs to collect
   //place food on all free path cells
@@ -438,6 +488,11 @@ function playGame() {
   elements.resultWindow.style.display = 'none'
   elements.mainWindow.style.display = 'block'
 
+  if (localStorage) {
+    if (!localStorage.getItem('highScore')) {
+      localStorage.setItem('highestScore', score)
+    }
+  }
 
   // ? start the game - loop 
   const myInterval = setInterval(() => {
@@ -455,18 +510,28 @@ function playGame() {
     pacman.eatFood()
   }, RUNSPEED - 200)
 
-
+  // let index = 0
+  // let array = []
   const myInterval1 = setInterval(() => {
     //? have ghosts move towards random directions in the grid
     // make ghosts move in a given direction until they have to turn if there are 2 or more 
     // choices at an intersection choose randomly
-    const array = Object.entries(activeGhosts)
-    for (let i = 1; i < array.length; i++) {
-      array[i][1].move()
-    }
+    activeGhosts.inky.move(changeDirection)
+    activeGhosts.pinky.move(changeDirection)
+    activeGhosts.clyde.move(changeDirection)
+    activeGhosts.blinky.move(changeDirection)
 
-  }, RUNSPEED)
-
+    // if (index === array.length) {
+    //   index = 0
+    //   array = astar.search(mappedGridArray, mappedGridArray[activeGhosts.blinky.y][activeGhosts.blinky.x],
+    //     mappedGridArray[pacman.y][pacman.x])
+    // } else {
+    //   activeGhosts.blinky.move(array[index])
+    // }
+    // index++
+  }, 1000)
+  // array = astar.search(mappedGridArray, mappedGridArray[activeGhosts.blinky.y][activeGhosts.blinky.x],
+  //   mappedGridArray[pacman.y][pacman.x])
 }
 
 
@@ -485,7 +550,7 @@ function playGame() {
 
 //? Responsive design
 
-//? Persistent leaderboard using localStorage
+
 
 //? Add more boards 
 //? will choose one according to time left

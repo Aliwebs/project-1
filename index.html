@@ -7,10 +7,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pacman</title>
   <link rel="stylesheet" href="style.css">
-  <script defer src="./smartGhost.js"></script>
-  <script defer src="./functions.js"></script>
-  <script defer src="./data.js"></script>
-  <script defer src="./main.js"></script>
+  <script defer src="./js/smartGhost.js"></script>
+  <script defer src="./js/functions.js"></script>
+  <script defer src="./js/data.js"></script>
+  <script defer src="./js/main.js"></script>
 
 </head>
 
@@ -18,9 +18,8 @@
   <main style="display: none;">
     <header>
       <h3>Your Score is: <span id="score"></span></h3>
-      <h3 id="highestScore">Highest Score</h3>
+      <h3>Highest Score <span id="highestScore"></span></h3>
     </header>
-
     <div id="game-window">
 
     </div>
@@ -30,6 +29,7 @@
       <h1>Pacman</h1>
       <div id="controls">
         <button class="playBtn">Play</button>
+        <button id="instructionBtn">Instructions</button>
         <button id="settingsBtn">Settings</button>
       </div>
     </div>
@@ -40,13 +40,21 @@
       <button class="playBtn">Play Again?</button>
     </div>
   </section>
+  <section id="instructions" style="display: none;">
+    <div>
+      <h2>Welcome To Pacman</h2>
+      <h3>To play use the W,A,S,D keys or the arrow keys.</h3>
+      <h3>Good luck!</h3>
+      <button class="exit">Exit</button>
+    </div>
+  </section>
   <section id="settings" style="display: none;">
     <div>
       <h2>Settings</h2>
       <button>SFX: <span id="SFX"></span></button>
       <button>Music: <span id="MUSIC"></span></button>
       <button>Framerate: <span id="framerate"></span></button>
-      <button id="exit">Exit</button>
+      <button class="exit">Exit</button>
     </div>
   </section>
   <!-- <button id="logmap">Log</button> -->

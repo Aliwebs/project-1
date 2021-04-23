@@ -8,8 +8,8 @@
 }
 
 :root {
-  --width: 800px;
-  --height: 800px;
+  --width: 40vw;
+  --height: 90vh;
   --rotateVal: 0deg;
 }
 
@@ -36,11 +36,12 @@ header {
 #game-window {
   display: flex;
   flex-flow: row wrap;
-  border: 2px solid yellow;
   height: var(--height);
   width: var(--width);
+  border: 2px solid yellow;
   background-color: black;
 }
+
 
 #game-window div {
   display: flex;
@@ -51,28 +52,25 @@ header {
 
 section {
   width: var(--width);
-  height: var(--width);
+  height: var(--height);
   background-color: black;
   color: white;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-#controls {
+section div {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
 }
 
-#results {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-content: center;
-}
-
+#controls,
+#instructions,
+#results,
 #settings {
   display: flex;
   flex-direction: column;
@@ -180,4 +178,19 @@ button:hover {
   animation-duration: 2s;
   animation-iteration-count: infinite;
   border-radius: 25%;
+}
+
+
+@media (min-width: 700px) {
+  #gameWindow {
+    --width: 70vw;
+    width: 50vw;
+  }
+}
+
+@media (max-width: 700px) {
+  #gameWindow {
+    --width: 40vw;
+    width: var(--width);
+  }
 }
