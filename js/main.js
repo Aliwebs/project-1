@@ -164,7 +164,7 @@ const pacman = {
       elements.mainWindow.style.display = 'none'
       elements.resultWindow.style.display = 'flex'
       //? If player looses stop game loop and display result
-      elements.displayResult.innerHTML = `Your loose! score is: ${score}`
+      elements.displayResult.innerHTML = `You loose! score is: ${score}`
       for (let i = 1; i < 999; i++) {
         clearInterval(i)
       }
