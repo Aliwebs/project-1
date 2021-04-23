@@ -27,14 +27,6 @@ let MUSIC = true
 let mappedGridArray
 let score = 0
 let isPlaying = true
-let activeGhosts = {
-  add(ghostName) {
-    if (this[ghostName] === undefined) {
-      this[ghostName] = ghost(GHOSTS_PRESET[ghostName].x, GHOSTS_PRESET[ghostName].y, ghostName)
-      return this[ghostName]
-    }
-  },
-}
 let frameIndex = 0
 const FRAMEOPTIONS = [20, 30, 40]
 let FRAMERATE = FRAMEOPTIONS[frameIndex]
@@ -58,6 +50,14 @@ const GHOSTS_PRESET = {
   },
 }
 
+let activeGhosts = {
+  add(ghostName) {
+    if (this[ghostName] === undefined) {
+      this[ghostName] = ghost(GHOSTS_PRESET[ghostName].x, GHOSTS_PRESET[ghostName].y, ghostName)
+      return this[ghostName]
+    }
+  },
+}
 
 
 function preSetup() {
@@ -143,10 +143,6 @@ const pacman = {
       this.y += (this.speed.y)
       this.spawn()
     }
-
-
-    //https://briangrinstead.com/blog/astar-search-algorithm-in-javascript/
-
     if (this.current().querySelector('.ghostBlink') !== null
       && this.current().querySelector('.pacman') !== null) {
       if (SFX) playSound('pacman_death')
@@ -159,10 +155,7 @@ const pacman = {
           activeGhosts.add(ghostId).spawn()
         }
       }, 1000)
-
     }
-
-
     //! player loses if pacman hits a ghost
     if (this.current().querySelector('.ghost') !== null
       && this.current().querySelector('.pacman')) {
@@ -340,6 +333,7 @@ function ghost(y, x, name) {
   }
 }
 
+// plays sounds given a file name
 function playSound(url) {
   let audio = document.createElement('audio')
   audio.src = `./assets/${url}`
@@ -362,7 +356,7 @@ function setup() {
     mappedGridArray[coordinate[0]][coordinate[1]].type = 'empty'
   })
 
-
+  //removes all edges that are facing another wall
   for (let i = 0; i < gridArray.length; i++) {
     if (gridArray[i].classList.contains('wall')) {
       if (gridArray[i + 1] !== undefined
@@ -397,7 +391,7 @@ function setup() {
       }
     })
   })
-
+  //place energizer
   const bigFoodCord = [[5, 2], [5, 24], [22, 2], [22, 24]]
 
   bigFoodCord.forEach(bigFood => {
@@ -452,6 +446,8 @@ function reset() {
   }
   pacman.x = 13
   pacman.y = 23
+  pacman.speed.x = 0
+  pacman.speed.y = 0
 }
 
 
@@ -495,7 +491,8 @@ function playGame() {
   }
 
   // ? start the game - loop 
-  const myInterval = setInterval(() => {
+  //pacman's interval
+  setInterval(() => {
     //? Teleport pacman
     if (pacman.current().classList.contains('portalLeft')
       || pacman.current().classList.contains('portalRight')) {
@@ -512,7 +509,8 @@ function playGame() {
 
   // let index = 0
   // let array = []
-  const myInterval1 = setInterval(() => {
+  //? Ghosts interval
+  setInterval(() => {
     //? have ghosts move towards random directions in the grid
     // make ghosts move in a given direction until they have to turn if there are 2 or more 
     // choices at an intersection choose randomly
@@ -520,7 +518,7 @@ function playGame() {
     activeGhosts.pinky.move(changeDirection)
     activeGhosts.clyde.move(changeDirection)
     activeGhosts.blinky.move(changeDirection)
-
+    //* Smart ghost movement not finished because of bug
     // if (index === array.length) {
     //   index = 0
     //   array = astar.search(mappedGridArray, mappedGridArray[activeGhosts.blinky.y][activeGhosts.blinky.x],
@@ -529,36 +527,11 @@ function playGame() {
     //   activeGhosts.blinky.move(array[index])
     // }
     // index++
-  }, 1000)
+  }, RUNSPEED)
   // array = astar.search(mappedGridArray, mappedGridArray[activeGhosts.blinky.y][activeGhosts.blinky.x],
   //   mappedGridArray[pacman.y][pacman.x])
 }
 
-
-
-
-
-
-//* enhancements
-
-//? Smart Ghosts
-
-
-//? will choose one according to time left
-// 1 Make ghosts move towards the general direction of the player
-// 2 Make ghosts draw a path to the player path can overlap 
-
-//? Responsive design
-
-
-
-//? Add more boards 
-//? will choose one according to time left
-// 1 Add different static boards for each level up
-// 2 Dynamically generate boards 
-
-//? Each board gets more difficult
-// I will do this by decresing exists from paths
 
 
 
