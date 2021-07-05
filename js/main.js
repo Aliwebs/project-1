@@ -59,7 +59,6 @@ let activeGhosts = {
   },
 }
 
-
 function preSetup() {
   //listen for game start button and call playGame if it is clicked
   elements.playBtn.forEach(button => {
@@ -72,7 +71,6 @@ function preSetup() {
   })
   //listen to settings and change accordingly
   elements.settingsWindow.addEventListener('click', (e) => {
-    console.log(e.target.lastChild)
     if (e.target.localName === 'button' || e.target.localName === 'span') {
       if (e.target.lastChild.id === 'SFX' || e.target.id === 'SFX') {
         SFX = !SFX
@@ -101,7 +99,6 @@ function preSetup() {
   })
 
   elements.instructionsWindow.addEventListener('click', (e) => {
-    console.log(e.target)
     if (e.target.localName === 'button' || e.target.localName === 'span') {
       if (e.target.classList.contains('exit')) {
         elements.mainMenu.style.display = 'flex'
@@ -164,7 +161,7 @@ const pacman = {
       elements.mainWindow.style.display = 'none'
       elements.resultWindow.style.display = 'flex'
       //? If player looses stop game loop and display result
-      elements.displayResult.innerHTML = `Your loose! score is: ${score}`
+      elements.displayResult.innerHTML = `You loose! score is: ${score}`
       for (let i = 1; i < 999; i++) {
         clearInterval(i)
       }
