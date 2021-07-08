@@ -68,7 +68,7 @@ function pacmanChangeDirectionOnInput() {
 
     //check which key it was and check if the tile to move is not a wall 
     // change speed x and y values accordingly
-    //also check if the key has been pressed already
+    //also check if pacman is already moving in that direction
     if (key === 'w' || key === 'ArrowUp') {
       if (!up.classList.contains('wall') && pacman.speed.y !== -1) {
         pacman.speed.x = 0

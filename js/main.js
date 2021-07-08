@@ -16,7 +16,6 @@ const elements = {
   music: document.querySelector('#MUSIC'),
   FPS: document.querySelector('#framerate'),
   instructionBtn: document.querySelector('#instructionBtn'),
-
 }
 
 const gridArray = new Array()
@@ -59,7 +58,6 @@ let activeGhosts = {
   },
 }
 
-
 function preSetup() {
   //listen for game start button and call playGame if it is clicked
   elements.playBtn.forEach(button => {
@@ -72,7 +70,6 @@ function preSetup() {
   })
   //listen to settings and change accordingly
   elements.settingsWindow.addEventListener('click', (e) => {
-    console.log(e.target.lastChild)
     if (e.target.localName === 'button' || e.target.localName === 'span') {
       if (e.target.lastChild.id === 'SFX' || e.target.id === 'SFX') {
         SFX = !SFX
@@ -101,7 +98,6 @@ function preSetup() {
   })
 
   elements.instructionsWindow.addEventListener('click', (e) => {
-    console.log(e.target)
     if (e.target.localName === 'button' || e.target.localName === 'span') {
       if (e.target.classList.contains('exit')) {
         elements.mainMenu.style.display = 'flex'
@@ -335,7 +331,7 @@ function ghost(y, x, name) {
 
 // plays sounds given a file name
 function playSound(url) {
-  let audio = document.createElement('audio')
+  const audio = document.createElement('audio')
   audio.src = `./assets/${url}`
   audio.play()
 }
@@ -421,6 +417,8 @@ function setup() {
   //? spawn pacman in predifined location without any movement
   //span pacman under the ghost spawn box 
   pacman.spawn()
+  //function exits in a different file  that is loaded before this file, hence the linter error
+  // eslint-disable-next-line no-undef
   pacmanChangeDirectionOnInput()
 
   //? spawn 4 ghosts in spawn box
@@ -514,9 +512,14 @@ function playGame() {
     //? have ghosts move towards random directions in the grid
     // make ghosts move in a given direction until they have to turn if there are 2 or more 
     // choices at an intersection choose randomly
+    //The changeDirection function is loaded from a different file inside the HTML hence the linter error.
+    // eslint-disable-next-line no-undef
     activeGhosts.inky.move(changeDirection)
+    // eslint-disable-next-line no-undef
     activeGhosts.pinky.move(changeDirection)
+    // eslint-disable-next-line no-undef
     activeGhosts.clyde.move(changeDirection)
+    // eslint-disable-next-line no-undef
     activeGhosts.blinky.move(changeDirection)
     //* Smart ghost movement not finished because of bug
     // if (index === array.length) {
@@ -527,7 +530,7 @@ function playGame() {
     //   activeGhosts.blinky.move(array[index])
     // }
     // index++
-  }, RUNSPEED)
+  }, RUNSPEED + 100)
   // array = astar.search(mappedGridArray, mappedGridArray[activeGhosts.blinky.y][activeGhosts.blinky.x],
   //   mappedGridArray[pacman.y][pacman.x])
 }
