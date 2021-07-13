@@ -1,3 +1,6 @@
+// algorithm to track pacman down 
+// !not used in final version of game due to memory leak bug (?)
+// code from https://briangrinstead.com/blog/astar-search-algorithm-in-javascript/
 const astar = {
   search: function (grid, start, end) {
 
