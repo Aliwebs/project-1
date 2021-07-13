@@ -1,4 +1,4 @@
-# PACMAN
+# PACMAN Clone (Project 1)
 
 # Summary
 
@@ -16,7 +16,7 @@ A [clone](https://aliwebs.github.io/project-1/) of the CLASSIC PACMAN game.
 - Use semantic markup for HTML and CSS (adhere to best practices)
 
 # Table of Contents
-- [PACMAN](#pacman)
+- [PACMAN Clone (Project 1)](#pacman-clone-project-1)
 - [Summary](#summary)
 - [Brief requirements](#brief-requirements)
 - [Table of Contents](#table-of-contents)
