@@ -281,7 +281,8 @@ function ghost(y, x, name) {
         this.stopBlinking()
       }
       //add position to visited
-      this.visited.push(`${this.y}:${this.x}`)
+      // code below is used by the A star algorithm not in use: 
+      // this.visited.push(`${this.y}:${this.x}`)
     },
     spawn(y, x) {
       const ghostSprite = document.createElement('span')
@@ -475,7 +476,6 @@ function reset() {
 function playGame() {
   const RUNSPEED = (10000 / FRAMERATE)
   isPlaying = true
-  if (!isPlaying) return
   reset()
   setup()
   elements.mainMenu.style.display = 'none'
@@ -521,7 +521,7 @@ function playGame() {
     activeGhosts.clyde.move(changeDirection)
     // eslint-disable-next-line no-undef
     activeGhosts.blinky.move(changeDirection)
-    //* Smart ghost movement not finished because of bug
+    //* Smart ghost movement not finished because of a bug
     // if (index === array.length) {
     //   index = 0
     //   array = astar.search(mappedGridArray, mappedGridArray[activeGhosts.blinky.y][activeGhosts.blinky.x],
