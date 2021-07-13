@@ -1,33 +1,54 @@
 # PACMAN
 
-## Summary
+# Summary
 
-A clone of the CLASSIC PACMAN game.
+A [clone](https://aliwebs.github.io/project-1/) of the CLASSIC PACMAN game.
+
+# Brief requirements
+
+- Render the game in a browser
+- Design logic for winning and display an endgame screen showing the result
+- Implement a projectile system which successfully removes elements on screen upon impact
+- Write out logic for enemy movement
+- Stick with KISS (Keep It Simple Stupid) and DRY (Don't Repeat Yourself) principles
+- Use JavaScript for DOM manipulation
+- Deploy your game online for others to access
+- Use semantic markup for HTML and CSS (adhere to best practices)
 
 # Table of Contents
-
+- [PACMAN](#pacman)
 - [Summary](#summary)
+- [Brief requirements](#brief-requirements)
 - [Table of Contents](#table-of-contents)
-  - [Game Loop](#game-loop)
+- [Technologies Used](#technologies-used)
+  - [Approach](#approach)
     - [Game start](#game-start)
     - [Reset](#reset)
     - [PACMAN game loop](#pacman-game-loop)
     - [Ghost game loop](#ghost-game-loop)
-  - [Aproach](#aproach)
     - [Level grid](#level-grid)
-  - [Movement](#movement)
-    - [Pacman Movement](#pacman-movement)
-    - [Pacman direction](#pacman-direction)
-    - [Ghost Movement](#ghost-movement)
-    - [Ghost Direction](#ghost-direction)
-  - [Special items](#special-items)
-  - [Final Comments](#final-comments)
+    - [Movement](#movement)
+      - [Pacman Movement](#pacman-movement)
+      - [Pacman direction](#pacman-direction)
+      - [Ghost Movement](#ghost-movement)
+      - [Ghost Direction](#ghost-direction)
+    - [Special items](#special-items)
+- [Screenshots](#screenshots)
+- [Struggles and Bugs](#struggles-and-bugs)
+- [Future improvements and final thoughts](#future-improvements-and-final-thoughts)
 
-## Game Loop
+# Technologies Used
+
+* HTML
+* CSS
+* JavaScript
+* Git & Github
+
+## Approach
 
 ### Game start
 
-The playGame function is called when the user clicks play on the game menu. It sets the RUNSPEED for the loops, it also set isPlaying to true,runs the reset and setup functions and finally hides the main menu and the result window and shows the game window. There is also a check to see if localStorage has a property called 'highScore' if it doesn't exist it creates it and sets it to 0, because the reset function that ran previusly resets the score to 0.
+The playGame function is called when the user clicks play on the game menu. It sets the RUN SPEED for the loops, it also sets isPlaying to true,runs the reset and setup functions and finally hides the main menu and the result window and shows the game window. There is also a check to see if localStorage has a property called 'highScore' if it doesn't exist it creates it and sets it to 0, because the reset function that ran previously resets the score to 0.
 
 ```javascript
 
@@ -51,7 +72,7 @@ function playGame() {
 
 ### Reset
 
-The reset function removes all tiles from map, sets score to 0, and creates an object that contains a method that can be used to CREATE ghosts. On hindsight this object should have gone outside the setup function and with all the other objects. Finally the function sets PACMAN back to his default postion and sets pacmans speed to 0. Again this should ideally have been a method on the PACMAN method.
+The reset function removes all tiles from map, sets score to 0, and creates an object that contains a method that can be used to CREATE ghosts. In hindsight this object should have gone outside the setup function and with all the other objects. Finally the function sets PACMAN back to his default position and sets pacmans speed to 0. Again this should ideally have been a method on the PACMAN method.
 
 ```javascript
 function reset() {
@@ -80,7 +101,7 @@ function reset() {
 
 ### PACMAN game loop
 
-This interval just checks if PACMAN steps in portals and teleports acordingly, also it calls the move method to make PACMAN move in the current direction and calls the eatFood method to make PACMAN eat food.
+This interval just checks if PACMAN steps in portals and teleports accordingly, also it calls the move method to make PACMAN move in the current direction and calls the eatFood method to make PACMAN eat food.
 
 ```javascript
 setInterval(() => {
@@ -96,7 +117,7 @@ setInterval(() => {
   pacman.move();
   //! pacman stops moving if it hits a wall while moving in a
   //! given direction until player turns pacman
-  //start pacman move and eatFood methods
+  //start pac man move and eatFood methods
   pacman.eatFood();
 }, RUNSPEED - 200);
 ```
@@ -114,11 +135,11 @@ setInterval(() => {
 }, RUNSPEED + 100);
 ```
 
-## Aproach
+
 
 ### Level grid
 
-The approach I had when making the level grid was to have coordinates for each tile in the grid indicating the type of grid it was going to be. I was thinking this way the was the possibility of having a map builder later on. Altough I did not have time to implement the user interface for such a feature I do have the code for it (commented out) inside the main JS file. The setup function below creates a map with the specified width and height and it maps the preset onto the map, the preset has to be made for the map of the specified size otherwise the preset does not draw properly. The setup function also smoothens the walls by removing all the borders from wall tiles that are facing other wall tiles.
+The approach I had when making the level grid was to have coordinates for each tile in the grid indicating the type of grid it was going to be. I was thinking of the possibility of having a map builder later on. Although I did not have time to implement the user interface for such a feature I do have the code for it (commented out) inside the main JS file. The setup function below creates a map with the specified width and height and it maps the preset onto the map, the preset has to be made for the map of the specified size otherwise the preset does not draw properly. The setup function also smoothens the walls by removing all the borders from wall tiles that are facing other wall tiles.
 
 ```javascript
 
@@ -161,9 +182,9 @@ function setup() {
 
 ```
 
-## Movement
+### Movement
 
-### Pacman Movement
+#### Pacman Movement
 
 Pacman's movement relies on a method in the pacman object that moves pacman depending on his x and y speed, every time the setInterval runs this method is called
 
@@ -180,7 +201,7 @@ move() {
 
 #### Pacman direction
 
-User input changes the direction of movement and does not control the speed of pacman, I tought this was a better experience for an arcade game, the snippet below is the logic that controls direction with user input
+User input changes the direction of movement and does not control the speed of pacman, I thought this was a better experience for an arcade game, the snippet below is the logic that controls direction with user input
 
 ```javascript
 if (key === "w" || key === "ArrowUp") {
@@ -210,9 +231,9 @@ if (key === "w" || key === "ArrowUp") {
 }
 ```
 
-### Ghost Movement
+#### Ghost Movement
 
-Ghosts move similarly using the method below on the ghost object to PACMAN except they are in their own loop and have their own speed, for level one that is slower than pacman. The move function takes in a function which decides and changes the heading direction of the ghost then the move function move the ghost in that direction accordingly. If PACMAN's energizer status (bigFood) is active it will also change the ghost status to blinking
+Ghosts move similarly using the method below on the ghost object to PACMAN except they are in their own loop and have their own speed, for level one that is slower than pacman. The move function takes in a function which decides and changes the heading direction of the ghost then the move function moves the ghost in that direction accordingly. If PACMAN's energizer status (bigFood) is active it will also change the ghost status to blinking
 
 ```javascript
 move(movementLogic) {
@@ -248,7 +269,7 @@ move(movementLogic) {
 
 #### Ghost Direction
 
-Ghosts direction changes with the following 3 functions, availableDirections checks which direction ghost is going and gives it the opposite direction i.e. (going horizontal will switch to vertical). The second function change direction first checks if the current tile is a part if that is the case it will teleport the ghost, otherwise it will check if next tile is a 'path' in which case it will pick one direction to move the ghosts to. If the target tile is a wall it will reverse the direction of movement. The checkDirection is the function that finalizes and changes the direction of the ghost, after checking if the path where it is trying to go is a path.
+Ghosts direction changes with the following 3 functions, availableDirections checks which direction the ghost is going and gives it the opposite direction i.e. (going horizontal will switch to vertical). The second function change direction first checks if the current tile is a part if that is the case it will teleport the ghost, otherwise it will check if the next tile is a 'path' in which case it will pick one direction to move the ghosts to. If the target tile is a wall it will reverse the direction of movement. The checkDirection is the function that finalizes and changes the direction of the ghost, after checking if the path where it is trying to go is a path.
 
 ```javascript
 function checkDirection(availableDirections, ghost) {
@@ -264,7 +285,7 @@ function checkDirection(availableDirections, ghost) {
   ) {
     ghost.speed.x = 0;
     ghost.speed.y = -1;
-    //check if there is a path on the right and then move to the rigt
+    //check if there is a path on the right and then move to the right
     //if a wall is found then call this function again
   } else if (
     cellRight.type === "path" &&
@@ -326,9 +347,9 @@ function changeDirection(ghost) {
 }
 ```
 
-## Special items
+### Special items
 
-Special items get placed onto the map on fixed tiles that are hardcoded, if the map builder feature was finshed this would be a function that would accept parameters for the locations of the special items. The code below places food on all paths, then it places energizers, portals and finishes by cleaning up food from areas not accessible to PACMAN.
+Special items get placed onto the map on fixed tiles that are hardcoded, if the map builder feature was finished this would be a function that would accept parameters for the locations of the special items. The code below places food on all paths, then it places energizers, portals and finishes by cleaning up food from areas not accessible to PACMAN.
 
 ```javascript
 //? place the food that pacman needs to collect
@@ -372,7 +393,31 @@ mappedGridArray[15][14].children[0].classList.remove("food");
 mappedGridArray[23][13].children[0].classList.remove("food");
 ```
 
-## Final Comments
+# Screenshots
 
-All in all I think the project can be imporved quite a bit in terms of readabilty and also functionalty by removing and organazing some of the code. There where a lot of mistakes made during the creation of this project but I think that was rather helpful as I knew of those mistakes I could keep them in mind in the coming projects.
-Overall the project was fun to make and the game is fun to play altough there is only one level you can try changing the FPS to make the game harder to play. Have fun!
+Game Menu
+![Game Menu](./screenshots/menu.PNG)
+
+Instructions
+![Instructions Window](./screenshots/instructions.PNG)
+
+Settings
+![Settings Menu](./screenshots/settings.PNG)
+
+Game Window
+![Game Window](./screenshots/game_window.PNG)
+
+# Struggles and Bugs
+
+I guess the biggest struggle I had was at the start of the project where I had to figure out how to convert an array of coordinates into an actual map. Another struggle I had was that the ghosts' movements would at times stop so I had to make an unlogical move with some of the else statements in the direction decision function.
+
+There was a big win due to that blocker though, which is that I was able to make my game work on an X and Y axis basis where implementing movement became much easier.
+
+The biggest bug so far in the game is that sometimes ghosts get stuck in walls, pass through the player etc. I added a lot of steps checking if the tile the ghost is moving to is a path or a wall but this bug still persists and unfortunately could not be solved. I do have an idea now of what it might have been, more likely than not it is to do with the timing between the two different setIntervals that run PACMAN and the GHOSTS independently. 
+
+# Future improvements and final thoughts
+
+The game can be improved by having more levels. Another thing that I really wanted to implement but didn't get time to implement was the map builder.
+
+Overall the project was fun to make and the game is fun to play although there is only one level you can try changing the FPS to make the game harder to play. Have fun!
+
