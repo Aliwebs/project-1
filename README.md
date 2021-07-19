@@ -1,10 +1,10 @@
-# PACMAN Clone (Project 1)
+# PACMAN
 
-# Summary
+## Summary
 
 A [clone](https://aliwebs.github.io/project-1/) of the CLASSIC PACMAN game.
 
-# Brief requirements
+## Brief requirements
 
 - Render the game in a browser
 - Design logic for winning and display an endgame screen showing the result
@@ -15,12 +15,12 @@ A [clone](https://aliwebs.github.io/project-1/) of the CLASSIC PACMAN game.
 - Deploy your game online for others to access
 - Use semantic markup for HTML and CSS (adhere to best practices)
 
-# Table of Contents
-- [PACMAN Clone (Project 1)](#pacman-clone-project-1)
-- [Summary](#summary)
-- [Brief requirements](#brief-requirements)
-- [Table of Contents](#table-of-contents)
-- [Technologies Used](#technologies-used)
+## Table of Contents
+- [PACMAN](#pacman)
+  - [Summary](#summary)
+  - [Brief requirements](#brief-requirements)
+  - [Table of Contents](#table-of-contents)
+  - [Technologies Used](#technologies-used)
   - [Approach](#approach)
     - [Game start](#game-start)
     - [Reset](#reset)
@@ -33,22 +33,31 @@ A [clone](https://aliwebs.github.io/project-1/) of the CLASSIC PACMAN game.
       - [Ghost Movement](#ghost-movement)
       - [Ghost Direction](#ghost-direction)
     - [Special items](#special-items)
-- [Screenshots](#screenshots)
-- [Struggles and Bugs](#struggles-and-bugs)
-- [Future improvements and final thoughts](#future-improvements-and-final-thoughts)
+  - [Screenshots](#screenshots)
+  - [Bugs](#bugs)
+  - [Wins & Challenges](#wins--challenges)
+  - [Future improvements](#future-improvements)
+  - [Key Learnings](#key-learnings)
 
-# Technologies Used
+## Technologies Used
 
-* HTML
-* CSS
-* JavaScript
-* Git & Github
+- HTML
+- CSS
+- JavaScript
+- Git & Github
 
 ## Approach
 
+I started by planning everything as comments I later filled with actual code. After which I figured how I was going to implement the level and in the end I came up with something like this:
+![map prototype](./assets/map_proto.PNG)
+I made it so I could click each tile which would change color to black and add that tile number to an array that I would later use as the map1 blueprint.
+Made a PACMAN object and a ghost object
+Added methods into the functions for actions like eat, move and blink (for ghosts)
+Added a direction system that controls the direction of PACMAN from user input and for ghosts is decided by an algorithm. 
+
 ### Game start
 
-The playGame function is called when the user clicks play on the game menu. It sets the RUN SPEED for the loops, it also sets isPlaying to true,runs the reset and setup functions and finally hides the main menu and the result window and shows the game window. There is also a check to see if localStorage has a property called 'highScore' if it doesn't exist it creates it and sets it to 0, because the reset function that ran previously resets the score to 0.
+The playGame function is called when the user clicks play on the game menu. It sets the RUN SPEED for the loops, it also sets isPlaying to true, runs the reset and setup functions and finally hides the main menu and the result window and shows the game window. There is also a check to see if localStorage has a property called 'highScore' if it doesn't exist it creates it and sets it to 0, because the reset function that ran previously resets the score to 0.
 
 ```javascript
 
@@ -77,9 +86,9 @@ The reset function removes all tiles from map, sets score to 0, and creates an o
 ```javascript
 function reset() {
   gridArray.forEach((elt) => {
-    elt.remove();
-  });
-  score = 0;
+    elt.remove()
+  })
+  score = 0
   activeGhosts = {
     add(ghostName) {
       if (this[ghostName] === undefined) {
@@ -87,15 +96,15 @@ function reset() {
           GHOSTS_PRESET[ghostName].x,
           GHOSTS_PRESET[ghostName].y,
           ghostName
-        );
-        return this[ghostName];
+        )
+        return this[ghostName]
       }
     },
-  };
-  pacman.x = 13;
-  pacman.y = 23;
-  pacman.speed.x = 0;
-  pacman.speed.y = 0;
+  }
+  pacman.x = 13
+  pacman.y = 23
+  pacman.speed.x = 0
+  pacman.speed.y = 0
 }
 ```
 
@@ -110,16 +119,16 @@ setInterval(() => {
     pacman.current().classList.contains("portalLeft") ||
     pacman.current().classList.contains("portalRight")
   ) {
-    pacman.teleport();
-    return;
+    pacman.teleport()
+    return
   }
 
-  pacman.move();
+  pacman.move()
   //! pacman stops moving if it hits a wall while moving in a
   //! given direction until player turns pacman
   //start pac man move and eatFood methods
-  pacman.eatFood();
-}, RUNSPEED - 200);
+  pacman.eatFood()
+}, RUNSPEED - 200)
 ```
 
 ### Ghost game loop
@@ -128,14 +137,12 @@ The ghost set interval calls the ghost move method every frame.
 
 ```javascript
 setInterval(() => {
-  activeGhosts.inky.move(changeDirection);
-  activeGhosts.pinky.move(changeDirection);
-  activeGhosts.clyde.move(changeDirection);
-  activeGhosts.blinky.move(changeDirection);
-}, RUNSPEED + 100);
+  activeGhosts.inky.move(changeDirection)
+  activeGhosts.pinky.move(changeDirection)
+  activeGhosts.clyde.move(changeDirection)
+  activeGhosts.blinky.move(changeDirection)
+}, RUNSPEED + 100)
 ```
-
-
 
 ### Level grid
 
@@ -186,7 +193,7 @@ function setup() {
 
 #### Pacman Movement
 
-Pacman's movement relies on a method in the pacman object that moves pacman depending on his x and y speed, every time the setInterval runs this method is called
+Pacman's movement relies on a method in the pacman object that moves pacman depending on his x and y speed, every time the setInterval runs this method is called.
 
 ```javascript
 move() {
@@ -201,39 +208,39 @@ move() {
 
 #### Pacman direction
 
-User input changes the direction of movement and does not control the speed of pacman, I thought this was a better experience for an arcade game, the snippet below is the logic that controls direction with user input
+User input changes the direction of movement and does not control the speed of pacman, I thought this was a better experience for an arcade game, the snippet below is the logic that controls direction with user input.
 
 ```javascript
 if (key === "w" || key === "ArrowUp") {
   if (!up.classList.contains("wall") && pacman.speed.y !== -1) {
-    pacman.speed.x = 0;
-    pacman.speed.y = -1;
-    document.documentElement.style.setProperty("--rotateVal", "-90deg");
+    pacman.speed.x = 0
+    pacman.speed.y = -1
+    document.documentElement.style.setProperty("--rotateVal", "-90deg")
   }
 } else if (key === "s" || key === "ArrowDown") {
   if (!down.classList.contains("wall") && pacman.speed.y !== 1) {
-    pacman.speed.x = 0;
-    pacman.speed.y = 1;
-    document.documentElement.style.setProperty("--rotateVal", "90deg");
+    pacman.speed.x = 0
+    pacman.speed.y = 1
+    document.documentElement.style.setProperty("--rotateVal", "90deg")
   }
 } else if (key === "a" || key === "ArrowLeft") {
   if (!left.classList.contains("wall") && pacman.speed.x !== -1) {
-    pacman.speed.y = 0;
-    pacman.speed.x = -1;
-    document.documentElement.style.setProperty("--rotateVal", "180deg");
+    pacman.speed.y = 0
+    pacman.speed.x = -1
+    document.documentElement.style.setProperty("--rotateVal", "180deg")
   }
 } else if (key === "d" || key === "ArrowRight") {
   if (!right.classList.contains("wall") && pacman.speed.x !== 1) {
-    pacman.speed.y = 0;
-    pacman.speed.x = 1;
-    document.documentElement.style.setProperty("--rotateVal", "360deg");
+    pacman.speed.y = 0
+    pacman.speed.x = 1
+    document.documentElement.style.setProperty("--rotateVal", "360deg")
   }
 }
 ```
 
 #### Ghost Movement
 
-Ghosts move similarly using the method below on the ghost object to PACMAN except they are in their own loop and have their own speed, for level one that is slower than pacman. The move function takes in a function which decides and changes the heading direction of the ghost then the move function moves the ghost in that direction accordingly. If PACMAN's energizer status (bigFood) is active it will also change the ghost status to blinking
+Ghosts move similarly using the method below on the ghost object to PACMAN except they are in their own loop and have their own speed, for level one that is slower than PAMAN. The move function takes in a function which decides and changes the heading direction of the ghost then the move function moves the ghost in that direction accordingly. If PACMAN's energizer status (bigFood) is active it will also change the ghost status to blinking
 
 ```javascript
 move(movementLogic) {
@@ -269,22 +276,22 @@ move(movementLogic) {
 
 #### Ghost Direction
 
-Ghosts direction changes with the following 3 functions, availableDirections checks which direction the ghost is going and gives it the opposite direction i.e. (going horizontal will switch to vertical). The second function change direction first checks if the current tile is a part if that is the case it will teleport the ghost, otherwise it will check if the next tile is a 'path' in which case it will pick one direction to move the ghosts to. If the target tile is a wall it will reverse the direction of movement. The checkDirection is the function that finalizes and changes the direction of the ghost, after checking if the path where it is trying to go is a path.
+Ghosts direction change with the following 3 functions, `availableDirections` checks which direction the ghost is going and gives it the opposite direction i.e. (going horizontal will switch to vertical). The second `changeDirection` function, checks if the current tile is a ‘path’ if that is the case it will teleport the ghost, otherwise it will check if the next tile is a 'path' in which case it will pick one direction to move the ghosts to. If the target tile is a wall it will reverse the direction of movement. The `checkDirection` is the function that finalizes and changes the direction of the ghost, after checking if the path where it is trying to go is a path.
 
 ```javascript
 function checkDirection(availableDirections, ghost) {
-  const cellUp = mappedGridArray[ghost.y - 1][ghost.x];
-  const cellDown = mappedGridArray[ghost.y + 1][ghost.x];
-  const cellLeft = mappedGridArray[ghost.y][ghost.x - 1];
-  const cellRight = mappedGridArray[ghost.y][ghost.x + 1];
+  const cellUp = mappedGridArray[ghost.y - 1][ghost.x]
+  const cellDown = mappedGridArray[ghost.y + 1][ghost.x]
+  const cellLeft = mappedGridArray[ghost.y][ghost.x - 1]
+  const cellRight = mappedGridArray[ghost.y][ghost.x + 1]
   //check if there is a path up
   if (
     cellUp.type === "path" &&
     availableDirections.includes("up") &&
     cellUp.querySelector(".ghost") === null
   ) {
-    ghost.speed.x = 0;
-    ghost.speed.y = -1;
+    ghost.speed.x = 0
+    ghost.speed.y = -1
     //check if there is a path on the right and then move to the right
     //if a wall is found then call this function again
   } else if (
@@ -292,35 +299,35 @@ function checkDirection(availableDirections, ghost) {
     availableDirections.includes("right") &&
     cellRight.querySelector(".ghost") === null
   ) {
-    ghost.speed.y = 0;
-    ghost.speed.x = 1;
+    ghost.speed.y = 0
+    ghost.speed.x = 1
     //check if there is a path down
   } else if (
     cellDown.type === "path" &&
     availableDirections.includes("down") &&
     cellDown.querySelector(".ghost") === null
   ) {
-    ghost.speed.x = 0;
-    ghost.speed.y = 1;
+    ghost.speed.x = 0
+    ghost.speed.y = 1
     //check if there is a path on the left
   } else if (
     cellLeft.type === "path" &&
     availableDirections.includes("left") &&
     cellLeft.querySelector(".ghost") === null
   ) {
-    ghost.speed.y = 0;
-    ghost.speed.x = -1;
+    ghost.speed.y = 0
+    ghost.speed.x = -1
   }
 }
 //check if there all available directions
 function availableDirections(ghost) {
   if (ghost.speed.x === -1 || ghost.speed.x === 1) {
-    return ["up", "down"];
+    return ["up", "down"]
   }
   if (ghost.speed.y === -1 || ghost.speed.y === 1) {
-    return ["right", "left"];
+    return ["right", "left"]
   }
-  return ["up", "down", "left", "right"];
+  return ["up", "down", "left", "right"]
 }
 
 function changeDirection(ghost) {
@@ -329,20 +336,20 @@ function changeDirection(ghost) {
     ghost.current().classList.contains("portalLeft") ||
     ghost.current().classList.contains("portalRight")
   ) {
-    ghost.teleport();
-    return;
+    ghost.teleport()
+    return
   }
   if (ghost.target().classList.contains("path")) {
     //for each block that the ghost is at give me all available directions
     //if the available direction is more than one pick randomly between the two
     //change direction
-    const difAvailableDirections = availableDirections(ghost);
+    const difAvailableDirections = availableDirections(ghost)
     const randomChoice = Math.floor(
       Math.random() * difAvailableDirections.length
-    );
-    checkDirection([difAvailableDirections[randomChoice]], ghost);
+    )
+    checkDirection([difAvailableDirections[randomChoice]], ghost)
   } else if (ghost.target().type === "wall") {
-    checkDirection(availableDirections(ghost), ghost);
+    checkDirection(availableDirections(ghost), ghost)
   }
 }
 ```
@@ -357,43 +364,43 @@ Special items get placed onto the map on fixed tiles that are hardcoded, if the 
 mappedGridArray.forEach((row) => {
   row.forEach((cell) => {
     if (!cell.classList.contains("wall") && cell.classList[0] !== "empty") {
-      const span = document.createElement("span");
-      span.classList.add("food");
-      cell.appendChild(span);
-      cell.type = "path";
-      cell.classList.add("path");
+      const span = document.createElement("span")
+      span.classList.add("food")
+      cell.appendChild(span)
+      cell.type = "path"
+      cell.classList.add("path")
     }
-  });
-});
+  })
+})
 //place energizer
 const bigFoodCord = [
   [5, 2],
   [5, 24],
   [22, 2],
   [22, 24],
-];
+]
 
 bigFoodCord.forEach((bigFood) => {
-  const elt = mappedGridArray[bigFood[0]][bigFood[1]].querySelector(".food");
-  elt.classList.remove("food");
-  elt.classList.add("bigFood");
-});
+  const elt = mappedGridArray[bigFood[0]][bigFood[1]].querySelector(".food")
+  elt.classList.remove("food")
+  elt.classList.add("bigFood")
+})
 
 //? set up teleport tunnels
-mappedGridArray[14][1].classList.add("portalLeft");
-mappedGridArray[14][25].classList.add("portalRight");
+mappedGridArray[14][1].classList.add("portalLeft")
+mappedGridArray[14][25].classList.add("portalRight")
 //?take food away from holding pen
-mappedGridArray[13][13].children[0].classList.remove("food");
-mappedGridArray[14][12].children[0].classList.remove("food");
-mappedGridArray[15][12].children[0].classList.remove("food");
-mappedGridArray[14][13].children[0].classList.remove("food");
-mappedGridArray[15][13].children[0].classList.remove("food");
-mappedGridArray[14][14].children[0].classList.remove("food");
-mappedGridArray[15][14].children[0].classList.remove("food");
-mappedGridArray[23][13].children[0].classList.remove("food");
+mappedGridArray[13][13].children[0].classList.remove("food")
+mappedGridArray[14][12].children[0].classList.remove("food")
+mappedGridArray[15][12].children[0].classList.remove("food")
+mappedGridArray[14][13].children[0].classList.remove("food")
+mappedGridArray[15][13].children[0].classList.remove("food")
+mappedGridArray[14][14].children[0].classList.remove("food")
+mappedGridArray[15][14].children[0].classList.remove("food")
+mappedGridArray[23][13].children[0].classList.remove("food")
 ```
 
-# Screenshots
+## Screenshots
 
 Game Menu
 ![Game Menu](./screenshots/menu.PNG)
@@ -407,17 +414,25 @@ Settings
 Game Window
 ![Game Window](./screenshots/game_window.PNG)
 
-# Struggles and Bugs
+## Bugs
+
+The biggest bug so far in the game is that sometimes ghosts get stuck in walls, pass through the player etc. I added a lot of steps checking if the tile the ghost is moving to is a path or a wall but this bug still persists and unfortunately could not be solved. I do have an idea now of what it might have been, more likely than not it is to do with the timing between the two different setIntervals that run PACMAN and the GHOSTS independently.
+
+## Wins & Challenges
 
 I guess the biggest struggle I had was at the start of the project where I had to figure out how to convert an array of coordinates into an actual map. Another struggle I had was that the ghosts' movements would at times stop so I had to make an unlogical move with some of the else statements in the direction decision function.
 
 There was a big win due to that blocker though, which is that I was able to make my game work on an X and Y axis basis where implementing movement became much easier.
 
-The biggest bug so far in the game is that sometimes ghosts get stuck in walls, pass through the player etc. I added a lot of steps checking if the tile the ghost is moving to is a path or a wall but this bug still persists and unfortunately could not be solved. I do have an idea now of what it might have been, more likely than not it is to do with the timing between the two different setIntervals that run PACMAN and the GHOSTS independently. 
+## Future improvements
 
-# Future improvements and final thoughts
+- More levels
+- Map builder
+- Better ghost movement by having them go to PACMAN instead of wander aimlessly. 
 
-The game can be improved by having more levels. Another thing that I really wanted to implement but didn't get time to implement was the map builder.
+## Key Learnings
 
-Overall the project was fun to make and the game is fun to play although there is only one level you can try changing the FPS to make the game harder to play. Have fun!
-
+- Learned how to manage window state with JS and CSS.
+- Learned a lot timing of actions especially when moving PACMAN.
+- I made use of methods when doing common tasks like current tile or target tile as it was repeated code I made into a method on the object of  PACMAN or the ghosts.
+- Learned about CSS transform property as it is used to rotate PACMAN into the direction he is moving in.
