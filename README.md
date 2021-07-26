@@ -51,7 +51,7 @@ A [clone](https://aliwebs.github.io/project-1/) of the CLASSIC PACMAN game.
 
 I started by planning everything as comments, which I later filled with actual code. After which I figured out how I was going to implement the level. In the end I came up with the following:
 ![map prototype](./assets/map_proto.png)
-Firstly I made each tile have an event listener, when a tile was clicked it would change background color to black and it's location number would be added to an array. I saved the array in `data.js`. Then in `index.html` I import `data.js` before my other JavaScript files so I can use the blueprint saved there.
+Firstly I made each tile have an event listener, when a tile was clicked it would change background color to black and it's location number would be added to an array. I saved the array in `data.js`. Then in `index.html` i imported `data.js` before my other JavaScript files so I can use the blueprint saved there.
 Then I made a PACMAN object and a ghost object.
 Last but not least I added methods into the functions for actions like eat, move and blink (for ghosts).
 Finally I added a direction system that controls the direction of PACMAN from user input and from an algorithm for ghosts.
