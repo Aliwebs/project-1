@@ -50,7 +50,7 @@ A [clone](https://aliwebs.github.io/project-1/) of the CLASSIC PACMAN game.
 ## Approach
 
 I started by planning everything as comments, which I later filled with actual code. After which I figured out how I was going to implement the level. In the end I came up with the following:
-![map prototype](./assets/map_proto.png)
+<img src="./assets/map_proto.png" alt="map prototype">
 Firstly I made each tile have an event listener, when a tile was clicked it would change background color to black and it's location number would be added to an array. I saved the array in `data.js`. Then in `index.html` i imported `data.js` before my other JavaScript files so I can use the blueprint saved there.
 Then I made a PACMAN object and a ghost object.
 Last but not least I added methods into the functions for actions like eat, move and blink (for ghosts).
@@ -404,16 +404,17 @@ mappedGridArray[23][13].children[0].classList.remove("food")
 ## Screenshots
 
 Game Menu
-![Game Menu](./screenshots/menu.png)
+<img src="./screenshots/menu.png" alt="Game Menu">
 
 Instructions
-![Instructions Window](./screenshots/instructions.png)
+<img src="./screenshots/instructions.png" alt="Instructions Window">
+
 
 Settings
-![Settings Menu](./screenshots/settings.png)
+<img src="./screenshots/settings.png" alt="Settings Menu">
 
 Game Window
-![Game Window](./screenshots/game_window.png)
+<img src="./screenshots/game_window.png" alt="Game Window">
 
 ## Bugs
 
