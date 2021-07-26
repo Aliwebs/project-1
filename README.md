@@ -18,27 +18,27 @@ A [clone](https://aliwebs.github.io/project-1/) of the CLASSIC PACMAN game.
 ## Table of Contents
 
 - [PACMAN](#pacman)
-- [Summary](#summary)
-- [Brief requirements](#brief-requirements)
-- [Table of Contents](#table-of-contents)
-- [Technologies Used](#technologies-used)
-- [Approach](#approach)
-  - [Game start](#game-start)
-  - [Reset](#reset)
-  - [PACMAN game loop](#pacman-game-loop)
-  - [Ghost game loop](#ghost-game-loop)
-  - [Level grid](#level-grid)
-  - [Movement](#movement)
-    - [Pacman Movement](#pacman-movement)
-    - [Pacman direction](#pacman-direction)
-    - [Ghost Movement](#ghost-movement)
-    - [Ghost Direction](#ghost-direction)
-  - [Special items](#special-items)
-- [Screenshots](#screenshots)
-- [Bugs](#bugs)
-- [Wins & Challenges](#wins--challenges)
-- [Future improvements](#future-improvements)
-- [Key Learnings](#key-learnings)
+  - [Summary](#summary)
+  - [Brief requirements](#brief-requirements)
+  - [Table of Contents](#table-of-contents)
+  - [Technologies Used](#technologies-used)
+  - [Approach](#approach)
+    - [Game start](#game-start)
+    - [Reset](#reset)
+    - [PACMAN game loop](#pacman-game-loop)
+    - [Ghost game loop](#ghost-game-loop)
+    - [Level grid](#level-grid)
+    - [Movement](#movement)
+      - [Pacman Movement](#pacman-movement)
+      - [Pacman direction](#pacman-direction)
+      - [Ghost Movement](#ghost-movement)
+      - [Ghost Direction](#ghost-direction)
+    - [Special items](#special-items)
+  - [Screenshots](#screenshots)
+  - [Bugs](#bugs)
+  - [Wins & Challenges](#wins--challenges)
+  - [Future improvements](#future-improvements)
+  - [Key Learnings](#key-learnings)
 
 ## Technologies Used
 
@@ -50,8 +50,8 @@ A [clone](https://aliwebs.github.io/project-1/) of the CLASSIC PACMAN game.
 ## Approach
 
 I started by planning everything as comments, which I later filled with actual code. After which I figured out how I was going to implement the level. In the end I came up with the following:
-![map prototype](./assets/map_proto.PNG)
-Firstly I made each tile have an event listener, when a tile was clicked it would change background color to black and it's location number would be added to an array. I saved the array in `data.js`, in `index.html` I am importing `data.js` before my other JavaScript files so I can use the blueprint saved there.
+![map prototype](./assets/map_proto.png)
+Firstly I made each tile have an event listener, when a tile was clicked it would change background color to black and it's location number would be added to an array. I saved the array in `data.js`. Then in `index.html` I import `data.js` before my other JavaScript files so I can use the blueprint saved there.
 Then I made a PACMAN object and a ghost object.
 Last but not least I added methods into the functions for actions like eat, move and blink (for ghosts).
 Finally I added a direction system that controls the direction of PACMAN from user input and from an algorithm for ghosts.
@@ -404,16 +404,16 @@ mappedGridArray[23][13].children[0].classList.remove("food")
 ## Screenshots
 
 Game Menu
-![Game Menu](./screenshots/menu.PNG)
+![Game Menu](./screenshots/menu.png)
 
 Instructions
-![Instructions Window](./screenshots/instructions.PNG)
+![Instructions Window](./screenshots/instructions.png)
 
 Settings
-![Settings Menu](./screenshots/settings.PNG)
+![Settings Menu](./screenshots/settings.png)
 
 Game Window
-![Game Window](./screenshots/game_window.PNG)
+![Game Window](./screenshots/game_window.png)
 
 ## Bugs
 
