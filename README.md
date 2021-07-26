@@ -16,6 +16,7 @@ A [clone](https://aliwebs.github.io/project-1/) of the CLASSIC PACMAN game.
 - Use semantic markup for HTML and CSS (adhere to best practices)
 
 ## Table of Contents
+
 - [PACMAN](#pacman)
   - [Summary](#summary)
   - [Brief requirements](#brief-requirements)
@@ -48,12 +49,12 @@ A [clone](https://aliwebs.github.io/project-1/) of the CLASSIC PACMAN game.
 
 ## Approach
 
-I started by planning everything as comments I later filled with actual code. After which I figured how I was going to implement the level and in the end I came up with something like this:
+I started by planning everything as comments, which I later filled with actual code. After which I figured out how I was going to implement the level. In the end I came up with the following:
 ![map prototype](./assets/map_proto.PNG)
-I made it so I could click each tile which would change color to black and add that tile number to an array that I would later use as the map1 blueprint.
-Made a PACMAN object and a ghost object
-Added methods into the functions for actions like eat, move and blink (for ghosts)
-Added a direction system that controls the direction of PACMAN from user input and for ghosts is decided by an algorithm. 
+Firtly I made each tile have an event listener, when a tile was clicked it would change background color to black and it's location number would be added to an array. I saved the array in `data.js`, in `index.html` I am importing `data.js` before my other JavaScript files so I can use the blueprint saved there.
+Then I made a PACMAN object and a ghost object.
+Last but not least I added methods into the functions for actions like eat, move and blink (for ghosts).
+Finally I added a direction systems that control the direction of PACMAN from user input and from an algorithm for ghosts.
 
 ### Game start
 
